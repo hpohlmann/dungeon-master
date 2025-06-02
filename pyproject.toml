@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dungeon-master"
+dynamic = ["version"]
+description = "Context-tracking pre-commit tool for Cursor AI integration"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Dungeon Master Team", email = "contact@dungeonmaster.dev"}
+]
+maintainers = [
+    {name = "Dungeon Master Team", email = "contact@dungeonmaster.dev"}
+]
+keywords = ["documentation", "git", "pre-commit", "context", "tracking", "cursor", "ai"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Version Control :: Git",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/dungeon-master"
+Documentation = "https://github.com/yourusername/dungeon-master#readme"
+Repository = "https://github.com/yourusername/dungeon-master.git"
+"Bug Reports" = "https://github.com/yourusername/dungeon-master/issues"
+Changelog = "https://github.com/yourusername/dungeon-master/releases"
+
+[project.scripts]
+dungeon-master = "dungeon_master.cli:main"
+dungeon_master = "dungeon_master.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=2.0",
+    "black>=21.0",
+    "flake8>=3.8",
+    "mypy>=0.800",
+    "pre-commit>=2.0",
+]
+
+[tool.setuptools]
+packages = ["dungeon_master"]
+
+[tool.setuptools.dynamic]
+version = {attr = "dungeon_master.__version__"}
+
+[tool.setuptools.package-data]
+dungeon_master = ["py.typed"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"] 

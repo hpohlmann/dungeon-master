@@ -1,0 +1,9 @@
+- id: dungeon-master
+  name: Dungeon Master Context Tracking
+  description: "Automatically maintain context documents for tracked files"
+  entry: python hooks/pre_commit_hook.py
+  language: system
+  pass_filenames: false
+  always_run: true
+  stages: [commit]
+  verbose: true
