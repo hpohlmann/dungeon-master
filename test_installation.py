@@ -35,10 +35,10 @@ def test_cli():
             return False
             
         # Test console script
-        result = subprocess.run(["dungeon-master", "--help"], 
+        result = subprocess.run(["dm", "--help"], 
                               capture_output=True, text=True)
         if result.returncode == 0:
-            print("✅ Console script 'dungeon-master' works")
+            print("✅ Console script 'dm' works")
         else:
             print(f"⚠️  Console script might not be in PATH: {result.stderr}")
         
@@ -145,7 +145,7 @@ def main():
         print("🚀 Dungeon Master is ready to use!")
         print("\n📝 Next steps:")
         print("   1. Go to your project directory")
-        print("   2. Run 'dungeon-master init'")
+        print("   2. Run 'dm init'")
         print("   3. Add @track_context('filename.md') to important files")
         print("   4. Install pre-commit: 'pre-commit install'")
         print("   5. Start committing and let Cursor help with documentation!")

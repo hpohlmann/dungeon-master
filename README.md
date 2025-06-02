@@ -127,7 +127,7 @@ pip install dungeon-master
 ### Initialize
 
 ```bash
-dungeon-master init
+dm init
 pre-commit install
 ```
 
@@ -151,27 +151,27 @@ Add the tracking decorator to any important file:
 
 ```bash
 # Create templates for staged files
-dungeon-master update
+dm update
 
 # Process specific files
-dungeon-master update src/auth.py src/utils.py
+dm update src/auth.py src/utils.py
 ```
 
 ### Check Status
 
 ```bash
 # List tracked files and their documentation status
-dungeon-master list --all
+dm list --all
 
 # Validate what would block commits
-dungeon-master validate
+dm validate
 ```
 
 ### Initialize Repository
 
 ```bash
 # Set up Dungeon Master in current repo
-dungeon-master init
+dm init
 ```
 
 ## 🔍 Validation Rules

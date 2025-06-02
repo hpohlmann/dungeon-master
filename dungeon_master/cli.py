@@ -246,12 +246,12 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  dungeon_master init                    # Initialize in current repo
-  dungeon_master update                  # Process all staged tracked files
-  dungeon_master update file1.py file2.py  # Process specific files
-  dungeon_master list                    # List staged tracked files
-  dungeon_master list --all              # List all tracked files
-  dungeon_master validate                # Check what would block commits
+  dm init                    # Initialize in current repo
+  dm update                  # Process all staged tracked files
+  dm update file1.py file2.py  # Process specific files
+  dm list                    # List staged tracked files
+  dm list --all              # List all tracked files
+  dm validate                # Check what would block commits
 """
     )
     

@@ -38,8 +38,8 @@ Repository = "https://github.com/yourusername/dungeon-master.git"
 Changelog = "https://github.com/yourusername/dungeon-master/releases"
 
 [project.scripts]
+dm = "dungeon_master.cli:main"
 dungeon-master = "dungeon_master.cli:main"
-dungeon_master = "dungeon_master.cli:main"
 
 [project.optional-dependencies]
 dev = [

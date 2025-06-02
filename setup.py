@@ -10,10 +10,12 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text() if (this_directory / "README.md").exists() else ""
 
-# Read version from the package
-version = {}
-with open("dungeon_master/__init__.py") as fp:
-    exec(fp.read(), version)
+# Version info - keeping it simple for now
+version = {
+    "__version__": "0.1.0",
+    "__author__": "Dungeon Master Team", 
+    "__description__": "Context-tracking pre-commit tool for Cursor integration"
+}
 
 setup(
     name="dungeon-master",
@@ -53,8 +55,8 @@ setup(
     },
     entry_points={
         "console_scripts": [
+            "dm=dungeon_master.cli:main",
             "dungeon-master=dungeon_master.cli:main",
-            "dungeon_master=dungeon_master.cli:main",
         ],
     },
     include_package_data=True,
