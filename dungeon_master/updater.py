@@ -51,7 +51,7 @@ def validate_context_document(context_doc_path: str) -> Tuple[bool, List[str]]:
 def _has_meaningful_content(content: str) -> bool:
     """Check if document has meaningful content beyond placeholders."""
     # Remove common template text and placeholders
-    cleaned_content = re.sub(r'\(.*?\)', '', content)  # Remove all placeholder text
+    cleaned_content = re.sub(r'<.*?>', '', content)  # Remove all placeholder text
     cleaned_content = re.sub(r'> \*\*Instructions.*?\*\*.*?(?=\n##|\Z)', '', cleaned_content, flags=re.DOTALL)
     cleaned_content = re.sub(r'#.*?\n', '', cleaned_content)  # Remove headers
     cleaned_content = re.sub(r'\*.*?\*', '', cleaned_content)  # Remove bold text

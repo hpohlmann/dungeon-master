@@ -144,7 +144,7 @@ def generate_context_template(file_path: str) -> str:
     # Assemble the complete template
     template = f"""# {filename} - Context Documentation
 
-> **Instructions for Cursor**: This is a context template. Please replace all placeholder text in parentheses with meaningful documentation. Remove this instruction block when complete.
+> **Instructions for Cursor**: This is a context template. Please replace all placeholder text in angle brackets with meaningful documentation. Remove this instruction block when complete.
 
 ## Purpose
 
@@ -164,13 +164,13 @@ def generate_context_template(file_path: str) -> str:
 
 ## Dependencies & Integration
 
-(Describe how this file integrates with other parts of the system. What files import this? What does this file depend on? Are there any important architectural considerations?)
+<Describe how this file integrates with other parts of the system. What files import this? What does this file depend on? Are there any important architectural considerations?>
 
 ## Changelog
 
 ### [{format_timestamp()}]
 - Context documentation created
-- (Add meaningful changelog entries as the file evolves)
+- <Add meaningful changelog entries as the file evolves>
 
 ---
 *This document is maintained by Cursor. Last updated: {format_timestamp()}*
@@ -193,7 +193,7 @@ def _generate_purpose_template(file_path: str, analysis: Dict[str, List[str]]) -
     else:
         context_hint = f"This {file_type}"
 
-    return f"(Describe the overall intent and responsibility of this file. {context_hint}. What problem does it solve? What is its role in the larger system?)"
+    return f"<Describe the overall intent and responsibility of this file. {context_hint}. What problem does it solve? What is its role in the larger system?>"
 
 
 def _generate_usage_template(file_path: str, analysis: Dict[str, List[str]]) -> str:
@@ -202,19 +202,19 @@ def _generate_usage_template(file_path: str, analysis: Dict[str, List[str]]) -> 
         f"**File Location**: `{file_path}`",
         "",
         "**Primary Use Cases**:",
-        "(List the main scenarios where this file/module is used)",
+        "<List the main scenarios where this file/module is used>",
         "",
         "**Key Dependencies**:"
     ]
 
     if analysis.get('imports'):
-        template_lines.append("(Review and document the purpose of these key imports:)")
+        template_lines.append("<Review and document the purpose of these key imports:>")
         for imp in analysis['imports'][:5]:
-            template_lines.append(f"- `{imp}`: (explain why this dependency is needed)")
+            template_lines.append(f"- `{imp}`: <explain why this dependency is needed>")
         if len(analysis['imports']) > 5:
             template_lines.append(f"- ... and {len(analysis['imports']) - 5} more dependencies")
     else:
-        template_lines.append("(List any important dependencies or note if this is a standalone module)")
+        template_lines.append("<List any important dependencies or note if this is a standalone module>")
 
     return '\n'.join(template_lines)
 
@@ -226,33 +226,33 @@ def _generate_functions_template(analysis: Dict[str, List[str]]) -> str:
     if analysis.get('classes'):
         sections.append("**Classes:**")
         for cls in analysis['classes']:
-            sections.append(f"- **{cls}**: (Describe the purpose and responsibility of this class)")
+            sections.append(f"- **{cls}**: <Describe the purpose and responsibility of this class>")
         sections.append("")
 
     if analysis.get('functions'):
         sections.append("**Key Functions:**")
-        sections.append("(Document the most important functions - you don't need to list every function, focus on the key ones:)")
+        sections.append("<Document the most important functions - you don't need to list every function, focus on the key ones:>")
         # Show first 5 functions as examples
         for func in analysis['functions'][:5]:
-            sections.append(f"- **{func}**: (Explain what this function does and when it's used)")
+            sections.append(f"- **{func}**: <Explain what this function does and when it's used>")
 
         if len(analysis['functions']) > 5:
-            sections.append(f"- (Document other important functions from the remaining {len(analysis['functions']) - 5})")
+            sections.append(f"- <Document other important functions from the remaining {len(analysis['functions']) - 5}>")
         sections.append("")
 
     if not analysis.get('classes') and not analysis.get('functions'):
-        sections = ["(Describe the key components, exports, or functionality provided by this file)"]
+        sections = ["<Describe the key components, exports, or functionality provided by this file>"]
 
     return '\n'.join(sections)
 
 
 def _generate_notes_template() -> str:
     """Generate usage notes template."""
-    return """(Document important usage patterns, gotchas, or considerations. For example:)
-- (How should other parts of the system interact with this file?)
-- (Are there any important patterns or conventions to follow?)
-- (What are common mistakes or pitfalls to avoid?)
-- (Any performance considerations or limitations?)"""
+    return """<Document important usage patterns, gotchas, or considerations. For example:>
+- <How should other parts of the system interact with this file?>
+- <Are there any important patterns or conventions to follow?>
+- <What are common mistakes or pitfalls to avoid?>
+- <Any performance considerations or limitations?>"""
 
 
 def _get_file_type_description(extension: str) -> str:
@@ -294,12 +294,12 @@ def has_unfilled_placeholders(content: str) -> bool:
     """
     # Look for placeholder patterns
     placeholder_patterns = [
-        r'\(.*?Describe.*?\)',
-        r'\(.*?List.*?\)',
-        r'\(.*?Explain.*?\)',
-        r'\(.*?Document.*?\)',
-        r'\(.*?Add.*?\)',
-        r'\(.*?Review.*?\)',
+        r'<.*?Describe.*?>',
+        r'<.*?List.*?>',
+        r'<.*?Explain.*?>',
+        r'<.*?Document.*?>',
+        r'<.*?Add.*?>',
+        r'<.*?Review.*?>',
         r'> \*\*Instructions for Cursor\*\*',  # Instruction block
     ]
 
@@ -335,7 +335,7 @@ def get_unfilled_sections(content: str) -> List[str]:
         match = re.search(pattern, content, re.DOTALL)
         if match:
             section_content = match.group(1)
-            if re.search(r'\(.*?(Describe|List|Explain|Document|Add|Review).*?\)', section_content, re.IGNORECASE):
+            if re.search(r'<.*?(Describe|List|Explain|Document|Add|Review).*?>', section_content, re.IGNORECASE):
                 unfilled_sections.append(section_name)
 
     # Check for instruction block
