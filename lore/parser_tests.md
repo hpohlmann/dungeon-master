@@ -83,6 +83,9 @@ The parser tests are critical because parser failures would break the entire Dun
 - Updated `test_parser.py` - please review and update context as needed
 
 ### [2025-06-02]
+- Updated `test_parser.py` - please review and update context as needed
+
+### [2025-06-02]
 
 - Context documentation created for parser tests
 - Documented test coverage for decorator detection and validation
