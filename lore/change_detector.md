@@ -70,31 +70,46 @@ The change detector ensures that documentation evolves with the codebase rather 
 ## Changelog
 
 ### [2025-06-02]
+
 - Updated `change_detector.py` - please review and update context as needed
 
 ### [2025-06-02]
+
 - Updated `change_detector.py` - please review and update context as needed
 
 ### [2025-06-02]
+
 - Updated `change_detector.py` - please review and update context as needed
 
 ### [2025-06-02]
+
 - Updated `change_detector.py` - please review and update context as needed
 
 ### [2025-06-02]
+
 - Updated `change_detector.py` - please review and update context as needed
 
 ### [2025-06-02]
+
 - Updated `change_detector.py` - please review and update context as needed
 
 ### [2025-06-02]
+
 - Updated `change_detector.py` - please review and update context as needed
+
+### [2025-06-02]
+
+- **Implemented stricter change detection**: Now flags ALL content changes as potentially significant, requiring developer review
+- Changed from lenient "assume not significant" to strict "assume potentially significant" approach
+- Improves quality by ensuring no changes slip through with generic changelog entries
+- Developers retain easy escape hatch via `dm review --mark-reviewed` for minor changes
 
 ### [2025-06-02]
 
 - Context documentation created for change detector module
 - Documented file signature analysis and caching mechanisms
 - Added notes about significance thresholds and review workflow integration
+
 ---
 
 _This document is maintained by Cursor. Last updated: 2025-06-02_

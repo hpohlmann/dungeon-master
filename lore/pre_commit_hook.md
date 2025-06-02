@@ -76,6 +76,11 @@ The simplified approach ensures that pre-commit behavior matches manual CLI usag
 
 ### [2025-06-02]
 
+- **Added developer guidance for minor changes**: Enhanced messaging to help developers understand when changes can be safely marked as reviewed without updating documentation
+- Improved user experience during commit blocking by providing clear next steps for both significant and minor changes
+
+### [2025-06-02]
+
 - Context documentation created for pre-commit hook
 - Documented integration with git workflow and commit blocking logic
 - Added notes about user guidance and error handling patterns

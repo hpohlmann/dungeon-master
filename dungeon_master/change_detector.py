@@ -134,11 +134,11 @@ class ChangeAnalysis:
             if change_ratio > 0.2:  # 20% change threshold
                 return True
 
-        # Check content hash for any changes
+        # Check content hash for ANY changes - stricter detection
         if self.old_sig.content_hash != self.new_sig.content_hash:
-            # Even small changes might be significant in critical files
-            # But we'll be less strict for minor changes
-            return False
+            # Flag ALL changes as potentially significant
+            # Developers can mark as reviewed if not actually critical
+            return True
 
         return False
 
@@ -187,7 +187,7 @@ class ChangeAnalysis:
         if not changes and self.old_sig.content_hash != self.new_sig.content_hash:
             changes.append("Content modified")
 
-        return changes or ["No significant changes detected"]
+        return changes or ["File modified"]
 
 
 class ChangeDetector:

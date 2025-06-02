@@ -318,7 +318,18 @@ def cmd_review(args) -> int:
     else:
         print(f"\n📝 To allow commits to proceed, mark these changes as reviewed:")
         print(f"   dm review --mark-reviewed")
-        print(f"\n💡 Make sure you've updated the context documentation to reflect these changes!")
+        print(f"\n💡 Update documentation if changes affect core functionality, OR")
+        print(f"   mark as reviewed if changes are minor/cosmetic:")
+        print(f"")
+        print(f"   🔍 REVIEW REQUIRED if changes affect:")
+        print(f"      • Core logic or system behavior")
+        print(f"      • API interfaces or function signatures")
+        print(f"      • Critical functionality or user workflows")
+        print(f"")
+        print(f"   ✅ SAFE TO MARK REVIEWED if changes are:")
+        print(f"      • Formatting, comments, or documentation")
+        print(f"      • Minor bug fixes without behavior changes")
+        print(f"      • Refactoring that doesn't change functionality")
         return 1
 
 

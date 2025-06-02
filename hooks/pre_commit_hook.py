@@ -88,6 +88,8 @@ def main() -> int:
     if exit_code != 0:
         print(f"\n❌ 'dm review' detected significant changes requiring attention")
         print("Review and update documentation, then run 'dm review --mark-reviewed'")
+        print("\n💡 Note: If changes are minor (formatting, comments, small fixes),")
+        print("   you can run 'dm review --mark-reviewed' to proceed without updating docs.")
         return exit_code
 
     # Step 3: Validate all documentation
