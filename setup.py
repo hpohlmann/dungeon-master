@@ -18,7 +18,7 @@ version = {
 }
 
 setup(
-    name="dungeon-master",
+    name="cursor-dungeon-master",
     version=version.get("__version__", "0.1.0"),
     author=version.get("__author__", "Dungeon Master Team"),
     author_email="contact@dungeonmaster.dev",

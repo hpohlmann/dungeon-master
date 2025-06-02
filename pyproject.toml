@@ -3,7 +3,7 @@ requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "dungeon-master"
+name = "cursor-dungeon-master"
 dynamic = ["version"]
 description = "Context-tracking pre-commit tool for Cursor AI integration"
 readme = "README.md"
