@@ -18,16 +18,16 @@ logger = logging.getLogger(__name__)
 def analyze_file_structure(file_path: str, file_content: str) -> Dict[str, List[str]]:
     """
     Analyze file structure to provide context for template generation.
-    
+
     Args:
         file_path: Path to the file
         file_content: Content of the file
-        
+
     Returns:
         Dict[str, List[str]]: Basic structural analysis for template context
     """
     extension = get_file_extension(file_path).lower()
-    
+
     if extension == '.py':
         return _analyze_python_structure(file_content)
     elif extension in ['.js', '.ts', '.jsx', '.tsx']:
@@ -50,11 +50,11 @@ def _analyze_python_structure(file_content: str) -> Dict[str, List[str]]:
     except SyntaxError as e:
         logger.warning(f"Could not parse Python file: {e}")
         return {'functions': [], 'classes': [], 'imports': []}
-    
+
     functions = []
     classes = []
     imports = []
-    
+
     for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef):
             args = [arg.arg for arg in node.args.args]
@@ -69,10 +69,10 @@ def _analyze_python_structure(file_content: str) -> Dict[str, List[str]]:
             module = node.module or ''
             for alias in node.names:
                 imports.append(f"{module}.{alias.name}" if module else alias.name)
-    
+
     return {
         'functions': functions,
-        'classes': classes, 
+        'classes': classes,
         'imports': imports
     }
 
@@ -82,7 +82,7 @@ def _analyze_javascript_structure(file_content: str) -> Dict[str, List[str]]:
     functions = []
     classes = []
     imports = []
-    
+
     # Simple regex patterns for basic analysis
     function_patterns = [
         r'function\s+(\w+)\s*\(',
@@ -90,26 +90,26 @@ def _analyze_javascript_structure(file_content: str) -> Dict[str, List[str]]:
         r'let\s+(\w+)\s*=\s*\(',
         r'(\w+)\s*\([^)]*\)\s*=>\s*{',
     ]
-    
+
     class_pattern = r'class\s+(\w+)'
     import_patterns = [
         r'import\s+.*?from\s+["\']([^"\']+)["\']',
         r'require\s*\(\s*["\']([^"\']+)["\']\s*\)',
     ]
-    
+
     # Extract functions
     for pattern in function_patterns:
         matches = re.findall(pattern, file_content)
         functions.extend(matches)
-    
+
     # Extract classes
     classes.extend(re.findall(class_pattern, file_content))
-    
+
     # Extract imports
     for pattern in import_patterns:
         matches = re.findall(pattern, file_content)
         imports.extend(matches)
-    
+
     return {
         'functions': list(set(functions)),
         'classes': list(set(classes)),
@@ -120,10 +120,10 @@ def _analyze_javascript_structure(file_content: str) -> Dict[str, List[str]]:
 def generate_context_template(file_path: str) -> str:
     """
     Generate a context document template with Cursor-specific placeholders.
-    
+
     Args:
         file_path: Path to the file to create template for
-        
+
     Returns:
         str: Template markdown document with placeholders for Cursor
     """
@@ -131,16 +131,16 @@ def generate_context_template(file_path: str) -> str:
     if not file_content:
         logger.error(f"Could not read file content for {file_path}")
         return ""
-    
+
     filename = Path(file_path).name
     analysis = analyze_file_structure(file_path, file_content)
-    
+
     # Generate template sections
     purpose_template = _generate_purpose_template(file_path, analysis)
     usage_template = _generate_usage_template(file_path, analysis)
     functions_template = _generate_functions_template(analysis)
     notes_template = _generate_notes_template()
-    
+
     # Assemble the complete template
     template = f"""# {filename} - Context Documentation
 
@@ -175,7 +175,7 @@ def generate_context_template(file_path: str) -> str:
 ---
 *This document is maintained by Cursor. Last updated: {format_timestamp()}*
 """
-    
+
     return template
 
 
@@ -183,7 +183,7 @@ def _generate_purpose_template(file_path: str, analysis: Dict[str, List[str]]) -
     """Generate purpose section template."""
     extension = get_file_extension(file_path).lower()
     file_type = _get_file_type_description(extension)
-    
+
     if analysis.get('classes') and analysis.get('functions'):
         context_hint = f"This {file_type} contains {len(analysis['classes'])} class(es) and {len(analysis['functions'])} function(s)"
     elif analysis.get('classes'):
@@ -192,7 +192,7 @@ def _generate_purpose_template(file_path: str, analysis: Dict[str, List[str]]) -
         context_hint = f"This {file_type} contains {len(analysis['functions'])} function(s)"
     else:
         context_hint = f"This {file_type}"
-    
+
     return f"(Describe the overall intent and responsibility of this file. {context_hint}. What problem does it solve? What is its role in the larger system?)"
 
 
@@ -206,7 +206,7 @@ def _generate_usage_template(file_path: str, analysis: Dict[str, List[str]]) -> 
         "",
         "**Key Dependencies**:"
     ]
-    
+
     if analysis.get('imports'):
         template_lines.append("(Review and document the purpose of these key imports:)")
         for imp in analysis['imports'][:5]:
@@ -215,34 +215,34 @@ def _generate_usage_template(file_path: str, analysis: Dict[str, List[str]]) -> 
             template_lines.append(f"- ... and {len(analysis['imports']) - 5} more dependencies")
     else:
         template_lines.append("(List any important dependencies or note if this is a standalone module)")
-    
+
     return '\n'.join(template_lines)
 
 
 def _generate_functions_template(analysis: Dict[str, List[str]]) -> str:
     """Generate functions/classes section template."""
     sections = []
-    
+
     if analysis.get('classes'):
         sections.append("**Classes:**")
         for cls in analysis['classes']:
             sections.append(f"- **{cls}**: (Describe the purpose and responsibility of this class)")
         sections.append("")
-    
+
     if analysis.get('functions'):
         sections.append("**Key Functions:**")
         sections.append("(Document the most important functions - you don't need to list every function, focus on the key ones:)")
         # Show first 5 functions as examples
         for func in analysis['functions'][:5]:
             sections.append(f"- **{func}**: (Explain what this function does and when it's used)")
-        
+
         if len(analysis['functions']) > 5:
             sections.append(f"- (Document other important functions from the remaining {len(analysis['functions']) - 5})")
         sections.append("")
-    
+
     if not analysis.get('classes') and not analysis.get('functions'):
         sections = ["(Describe the key components, exports, or functionality provided by this file)"]
-    
+
     return '\n'.join(sections)
 
 
@@ -278,17 +278,17 @@ def _get_file_type_description(extension: str) -> str:
         '.sh': 'shell script',
         '.md': 'documentation'
     }
-    
+
     return descriptions.get(extension, 'source code')
 
 
 def has_unfilled_placeholders(content: str) -> bool:
     """
     Check if a context document still contains unfilled placeholder text.
-    
+
     Args:
         content: Content of the context document
-        
+
     Returns:
         bool: True if document contains placeholders that need to be filled
     """
@@ -302,26 +302,26 @@ def has_unfilled_placeholders(content: str) -> bool:
         r'\(.*?Review.*?\)',
         r'> \*\*Instructions for Cursor\*\*',  # Instruction block
     ]
-    
+
     for pattern in placeholder_patterns:
         if re.search(pattern, content, re.IGNORECASE):
             return True
-    
+
     return False
 
 
 def get_unfilled_sections(content: str) -> List[str]:
     """
     Get a list of sections that still need to be filled.
-    
+
     Args:
         content: Content of the context document
-        
+
     Returns:
         List[str]: List of section names that need attention
     """
     unfilled_sections = []
-    
+
     # Check each section for placeholders
     section_checks = {
         'Purpose': r'## Purpose\s*\n(.*?)(?=\n## |\Z)',
@@ -330,16 +330,16 @@ def get_unfilled_sections(content: str) -> List[str]:
         'Usage Notes': r'## Usage Notes\s*\n(.*?)(?=\n## |\Z)',
         'Dependencies': r'## Dependencies.*?\s*\n(.*?)(?=\n## |\Z)',
     }
-    
+
     for section_name, pattern in section_checks.items():
         match = re.search(pattern, content, re.DOTALL)
         if match:
             section_content = match.group(1)
             if re.search(r'\(.*?(Describe|List|Explain|Document|Add|Review).*?\)', section_content, re.IGNORECASE):
                 unfilled_sections.append(section_name)
-    
+
     # Check for instruction block
     if re.search(r'> \*\*Instructions for Cursor\*\*', content):
         unfilled_sections.append('Instructions block (remove when complete)')
-    
-    return unfilled_sections 
+
+    return unfilled_sections

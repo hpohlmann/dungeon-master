@@ -12,19 +12,19 @@ from typing import Optional, Dict, Any
 
 class AuthService:
     """Authentication service for handling user login and token management."""
-    
+
     def __init__(self, secret_key: str):
         self.secret_key = secret_key
         self.active_sessions = {}
-    
+
     def hash_password(self, password: str) -> str:
         """Hash a password using SHA-256."""
         return hashlib.sha256(password.encode()).hexdigest()
-    
+
     def verify_password(self, password: str, hashed: str) -> bool:
         """Verify a password against its hash."""
         return self.hash_password(password) == hashed
-    
+
     def generate_token(self, user_id: str, expires_in: int = 3600) -> str:
         """Generate a JWT token for a user."""
         payload = {
@@ -33,7 +33,7 @@ class AuthService:
             'iat': datetime.utcnow()
         }
         return jwt.encode(payload, self.secret_key, algorithm='HS256')
-    
+
     def verify_token(self, token: str) -> Optional[Dict[str, Any]]:
         """Verify and decode a JWT token."""
         try:
@@ -43,7 +43,7 @@ class AuthService:
             return None
         except jwt.InvalidTokenError:
             return None
-    
+
     def login(self, username: str, password: str, user_data: Dict[str, str]) -> Optional[str]:
         """Authenticate a user and return a token."""
         stored_hash = user_data.get('password_hash')
@@ -55,14 +55,14 @@ class AuthService:
             }
             return token
         return None
-    
+
     def logout(self, user_id: str) -> bool:
         """Log out a user by removing their session."""
         if user_id in self.active_sessions:
             del self.active_sessions[user_id]
             return True
         return False
-    
+
     def is_authenticated(self, token: str) -> bool:
         """Check if a token is valid and user is authenticated."""
         payload = self.verify_token(token)
@@ -92,4 +92,4 @@ def validate_user_credentials(username: str, password: str) -> bool:
         return False
     if not password or len(password) < 8:
         return False
-    return True 
+    return True
