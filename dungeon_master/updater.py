@@ -10,6 +10,7 @@ import logging
 
 from .utils import read_file_content, write_file_content, format_timestamp
 from .generator import has_unfilled_placeholders, get_unfilled_sections
+from .change_detector import ChangeDetector, ChangeAnalysis
 
 logger = logging.getLogger(__name__)
 
@@ -197,12 +198,35 @@ def get_validation_status(tracked_files: Dict[str, str], output_dir: Path) -> Di
     return status
 
 
-def get_blocking_issues(validation_status: Dict[str, Dict[str, any]]) -> List[str]:
+def check_for_significant_changes(tracked_files: Dict[str, str]) -> Tuple[List[ChangeAnalysis], bool]:
+    """
+    Check tracked files for significant changes that require documentation updates.
+    
+    Args:
+        tracked_files: Dictionary mapping file_path -> context_document_name
+        
+    Returns:
+        Tuple[List[ChangeAnalysis], bool]: (significant_changes, should_block_commit)
+    """
+    detector = ChangeDetector()
+    file_paths = list(tracked_files.keys())
+    
+    significant_changes = detector.get_significant_changes(file_paths)
+    
+    # Check if any changes require blocking
+    should_block = any(change.is_significant for change in significant_changes)
+    
+    return significant_changes, should_block
+
+
+def get_blocking_issues(validation_status: Dict[str, Dict[str, any]], 
+                       significant_changes: List[ChangeAnalysis] = None) -> List[str]:
     """
     Get list of issues that should block a commit.
     
     Args:
         validation_status: Status from get_validation_status
+        significant_changes: List of significant changes detected
         
     Returns:
         List[str]: List of blocking issues
@@ -218,4 +242,30 @@ def get_blocking_issues(validation_status: Dict[str, Dict[str, any]]) -> List[st
             issue_list = ', '.join(status['issues'])
             blocking_issues.append(f"Context document needs completion: {context_doc} ({issue_list})")
     
-    return blocking_issues 
+    # Add significant change issues
+    if significant_changes:
+        for change in significant_changes:
+            if change.is_significant:
+                change_desc = '; '.join(change.changes[:3])  # Limit description length
+                blocking_issues.append(f"Significant changes detected in {change.file_path}: {change_desc}")
+    
+    return blocking_issues
+
+
+def mark_changes_as_reviewed(tracked_files: Dict[str, str]) -> bool:
+    """
+    Mark file changes as reviewed, updating the change detection cache.
+    
+    Args:
+        tracked_files: Dictionary mapping file_path -> context_document_name
+        
+    Returns:
+        bool: True if successful
+    """
+    try:
+        detector = ChangeDetector()
+        detector.mark_as_reviewed(list(tracked_files.keys()))
+        return True
+    except Exception as e:
+        logger.error(f"Could not mark changes as reviewed: {e}")
+        return False 

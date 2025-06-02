@@ -121,7 +121,7 @@ Once completed, the commit proceeds with updated documentation:
 ### Installation
 
 ```bash
-pip install dungeon-master
+pip install cursor-dungeon-master
 ```
 
 ### Initialize
@@ -293,6 +293,43 @@ make demo  # See the system in action
 - [ ] **Configuration**: Customizable templates and validation rules
 - [ ] **Analytics**: Documentation coverage and quality metrics
 - [ ] **IDE Plugins**: Direct integration with VSCode, IntelliJ, etc.
+
+## 📝 Changelog
+
+### Version 0.2.0 - Significant Change Detection
+
+**🔄 New Features:**
+
+- **Significant Change Detection**: Automatically detects when tracked files have substantial changes (new/removed functions, classes, major modifications)
+- **Review Workflow**: New `dm review` command to manage significant changes
+- **Smart Commit Blocking**: Commits are blocked when significant changes haven't been reviewed
+- **File Signature Caching**: Intelligent caching system to track file changes over time
+- **Enhanced CLI**: Added `dm review --mark-reviewed` to approve changes
+
+**🎯 Workflow Updates:**
+
+- Pre-commit hook now validates both template completion AND significant changes
+- Developers must review significant changes before commits proceed
+- Context documentation updates are enforced when code changes substantially
+- Cache system (`.dungeon_master_cache.json`) tracks file signatures
+
+**✨ Benefits:**
+
+- Ensures documentation stays current with code evolution
+- Prevents outdated documentation from becoming stale
+- Human-in-the-loop approval for substantial changes
+- Maintains documentation quality through the development lifecycle
+
+### Version 0.1.0 - Initial Release
+
+**🚀 Core Features:**
+
+- File tracking with `@track_context("filename.md")` decorators
+- Template generation with Cursor-specific placeholders
+- Commit blocking until templates are completed
+- CLI commands (`dm init`, `dm update`, `dm list`, `dm validate`)
+- Pre-commit hook integration
+- Multi-language support (Python, JavaScript, TypeScript)
 
 ## 📄 License
 

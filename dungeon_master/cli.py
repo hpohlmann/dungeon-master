@@ -16,6 +16,7 @@ from . import (
 )
 from .updater import get_validation_status, get_blocking_issues
 from .utils import write_file_content
+from .change_detector import ChangeDetector
 
 
 def cmd_update(args) -> int:
@@ -170,17 +171,34 @@ def cmd_validate(args) -> int:
     
     output_dir = ensure_output_directory()
     validation_status = get_validation_status(tracked_files, output_dir)
-    blocking_issues = get_blocking_issues(validation_status)
+    
+    # Check for significant changes
+    from .updater import check_for_significant_changes
+    significant_changes, changes_block = check_for_significant_changes(tracked_files)
+    
+    # Get blocking issues (including significant changes)
+    blocking_issues = get_blocking_issues(validation_status, significant_changes)
     
     print("🔍 Context Documentation Validation")
     print("=" * 50)
     
+    if significant_changes:
+        print("\n🔄 Significant changes detected:")
+        for change in significant_changes:
+            print(f"\n   📄 {change.file_path}")
+            for change_desc in change.changes:
+                print(f"      • {change_desc}")
+    
     if not blocking_issues:
-        print("✅ All context documents are complete and valid!")
-        print("   Commits will not be blocked.")
+        if significant_changes:
+            print("\n⚠️  Significant changes detected but would not block commits.")
+            print("   Consider running 'dm review' to manage these changes.")
+        else:
+            print("\n✅ All context documents are complete and valid!")
+            print("   Commits will not be blocked.")
         return 0
     else:
-        print("❌ Issues found that would block commits:")
+        print("\n❌ Issues found that would block commits:")
         for issue in blocking_issues:
             print(f"   • {issue}")
         
@@ -188,6 +206,10 @@ def cmd_validate(args) -> int:
         for file_path, status in validation_status.items():
             if not status['valid']:
                 print(f"   • dungeon_master/{status['context_doc']}")
+        
+        if significant_changes:
+            print("\n🔄 To resolve significant changes:")
+            print("   • dm review --mark-reviewed")
         
         return 1
 
@@ -239,6 +261,66 @@ def cmd_init(args) -> int:
     return 0
 
 
+def cmd_review(args) -> int:
+    """
+    Mark significant changes as reviewed, allowing commits to proceed.
+    
+    Args:
+        args: Command arguments
+        
+    Returns:
+        int: Exit code
+    """
+    if args.files:
+        tracked_files = parse_tracked_files(args.files)
+        file_paths = args.files
+    else:
+        # Find all tracked files
+        import os
+        all_files = []
+        for root, dirs, files in os.walk('.'):
+            dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['node_modules', '__pycache__', 'build', 'dist']]
+            for file in files:
+                file_path = os.path.join(root, file)
+                if not file.startswith('.'):
+                    all_files.append(file_path.replace('./', ''))
+        
+        tracked_files = parse_tracked_files(all_files)
+        file_paths = list(tracked_files.keys())
+    
+    if not tracked_files:
+        print("No tracked files found.")
+        return 0
+    
+    # Check for significant changes
+    detector = ChangeDetector()
+    significant_changes = detector.get_significant_changes(file_paths)
+    
+    if not significant_changes:
+        print("✅ No significant changes detected that require review.")
+        return 0
+    
+    print("🔍 Significant changes detected:")
+    print("=" * 50)
+    
+    for change in significant_changes:
+        print(f"\n📄 {change.file_path}")
+        for change_desc in change.changes:
+            print(f"   • {change_desc}")
+    
+    if args.mark_reviewed:
+        # Mark as reviewed without prompting
+        detector.mark_as_reviewed(file_paths)
+        print(f"\n✅ Marked {len(significant_changes)} file(s) as reviewed.")
+        print("   Future commits will proceed unless new significant changes are made.")
+        return 0
+    else:
+        print(f"\n📝 To allow commits to proceed, mark these changes as reviewed:")
+        print(f"   dm review --mark-reviewed")
+        print(f"\n💡 Make sure you've updated the context documentation to reflect these changes!")
+        return 1
+
+
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
@@ -252,6 +334,8 @@ Examples:
   dm list                    # List staged tracked files
   dm list --all              # List all tracked files
   dm validate                # Check what would block commits
+  dm review                  # Check for significant changes
+  dm review --mark-reviewed  # Mark changes as reviewed
 """
     )
     
@@ -275,6 +359,12 @@ Examples:
     # Init command
     init_parser = subparsers.add_parser('init', help='Initialize Dungeon Master')
     init_parser.set_defaults(func=cmd_init)
+    
+    # Review command
+    review_parser = subparsers.add_parser('review', help='Review significant changes in tracked files')
+    review_parser.add_argument('files', nargs='*', help='Specific files to review')
+    review_parser.add_argument('--mark-reviewed', action='store_true', help='Mark changes as reviewed')
+    review_parser.set_defaults(func=cmd_review)
     
     args = parser.parse_args()
     
