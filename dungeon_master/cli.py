@@ -4,6 +4,7 @@ Command-line interface for Dungeon Master.
 """
 
 import argparse
+import os
 import sys
 from pathlib import Path
 from typing import List, Dict
@@ -94,7 +95,6 @@ def cmd_list(args) -> int:
     """
     if args.all:
         # Find all tracked files in the repository
-        import os
         all_files = []
         for root, dirs, files in os.walk('.'):
             # Skip hidden directories and common build directories
@@ -155,7 +155,6 @@ def cmd_validate(args) -> int:
         tracked_files = parse_tracked_files(args.files)
     else:
         # Find all tracked files
-        import os
         all_files = []
         for root, dirs, files in os.walk('.'):
             dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['node_modules', '__pycache__', 'build', 'dist']]
@@ -277,7 +276,6 @@ def cmd_review(args) -> int:
         file_paths = args.files
     else:
         # Find all tracked files
-        import os
         all_files = []
         for root, dirs, files in os.walk('.'):
             dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['node_modules', '__pycache__', 'build', 'dist']]

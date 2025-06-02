@@ -79,7 +79,7 @@ def function1():
         template = generate_context_template(test_file)
         assert template, "Template should not be empty"
         assert "Instructions for Cursor" in template, "Template should contain Cursor instructions"
-        assert "(Describe the overall intent" in template, "Template should contain placeholders"
+        assert "<Describe the overall intent" in template, "Template should contain placeholders"
 
         # Test placeholder detection
         assert has_unfilled_placeholders(template) == True, "Should detect unfilled placeholders"
@@ -110,14 +110,14 @@ def test_validation():
 
 ## Purpose
 
-(Describe the overall intent and responsibility of this file)
+<Describe the overall intent and responsibility of this file>
 
 ## Usage Summary
 
 **File Location**: `test.py`
 
 **Key Dependencies**:
-(List any important dependencies)
+<List any important dependencies>
 
 ---
 *This document is maintained by Cursor. Last updated: 2025-06-02*

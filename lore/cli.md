@@ -1,106 +1,100 @@
-# cli.py - Context Documentation
+# dungeon_master/cli.py - Context Documentation
 
 ## Purpose
 
-This module provides the command-line interface for Dungeon Master, serving as the primary entry point for user interactions. It implements a comprehensive CLI with subcommands for initializing repositories, managing context documentation, validating templates, and reviewing significant changes. The module acts as the orchestrator that ties together all other Dungeon Master components to provide a cohesive user experience.
+This file implements the primary command-line interface for Dungeon Master, providing intuitive commands for developers to manage context documentation throughout their development workflow. It serves as the main user interaction point with the system, offering commands for initialization, file processing, validation, and change management.
+
+## Key Functionality
+
+**Core Command Structure**:
+
+- **dm init**: Initialize Dungeon Master in a repository with proper directory setup
+- **dm update**: Process tracked files, create templates, or validate existing documentation
+- **dm list**: Display tracked files and their documentation status with filtering options
+- **dm validate**: Check documentation completeness and identify commit-blocking issues
+- **dm review**: Manage significant changes with developer-friendly guidance
+
+**Change Detection Integration**:
+
+- Seamlessly integrates with `ChangeDetector` for identifying significant modifications
+- Provides clear guidance on when documentation updates are required vs. safe to mark as reviewed
+- Implements developer-friendly escape hatches for minor changes (formatting, comments, small fixes)
+- Uses stricter change detection that flags all content changes as potentially significant
+
+**File Discovery & Processing**:
+
+- Efficient file walking with proper exclusion of hidden and build directories
+- Consolidated import handling for clean code organization
+- Supports both staged-file processing and repository-wide analysis
+- Handles multiple file processing with clear per-file status reporting
+
+**User Experience Features**:
+
+- Rich command-line help with practical examples
+- Color-coded status indicators (✓, ⚠️, ✗) for quick visual scanning
+- Detailed guidance messages that help developers make informed decisions
+- Progress indicators and clear error reporting
 
 ## Usage Summary
 
 **File Location**: `dungeon_master/cli.py`
 
-**Primary Use Cases**:
-
-- Initialize Dungeon Master in new repositories (`dm init`)
-- Generate and update context doc templates (`dm update`)
-- Show tracked files and their doc status via `dm list`
-- Validate context docs for completeness via `dm validate`
-- Manage and approve significant file changes via `dm review`
-
 **Key Dependencies**:
 
-- `argparse`: Provides robust command-line argument parsing and help generation
-- `sys`: Used for exit codes and system-level operations
-- `pathlib.Path`: Modern path handling for cross-platform file operations
-- `typing.List`, `typing.Dict`: Type hints for better code maintainability
-- Internal modules: Imports core functionality from parser, generator, updater, and utils
+- `argparse`: Command-line argument parsing and help generation
+- `os`: File system operations (consolidated import for clean code)
+- `pathlib.Path`: Modern path handling and directory operations
+- Core dungeon_master modules: parser, generator, updater, utils, change_detector
 
-## Key Functions or Classes
+**CLI Examples**:
 
-**Key Functions**:
+```bash
+dm init                    # Initialize in current repo
+dm update                  # Process all staged tracked files
+dm update file1.py file2.py  # Process specific files
+dm list                    # List staged tracked files
+dm list --all              # List all tracked files
+dm validate                # Check what would block commits
+dm review                  # Check for significant changes
+dm review --mark-reviewed  # Mark changes as reviewed
+```
 
-- **cmd_update(args)**: Creates templates or validates existing context docs for tracked files. Handles both specific files and staged files from git.
-- **cmd_list(args)**: Shows tracked files and their context doc status. Supports `--all` flag to show all tracked files vs just staged ones.
-- **cmd_validate(args)**: Validates context docs and shows what would block a commit. Checks for incomplete templates and significant changes.
-- **cmd_init(args)**: Initializes Dungeon Master in the current repository. Creates output directory and sample pre-commit configuration.
-- **cmd_review(args)**: Manages significant change detection. Allows checking changes and marking them as approved with --mark-reviewed.
-- **main()**: Entry point that sets up argument parsing with subcommands and delegates to appropriate command handlers.
+**Command Integration**:
 
-## Usage Notes
-
-- The CLI follows standard Unix conventions with clear help messages and appropriate exit codes
-- All commands that modify files provide clear feedback about what was created or updated
-- Error handling is comprehensive with user-friendly messages for common failure scenarios
-- The `validate` command serves as a dry-run to show what the pre-commit hook would do
-- Commands automatically detect git repository context and work with staged files when appropriate
-- The CLI is designed to be both interactive (for developers) and scriptable (for automation)
-
-## Dependencies & Integration
-
-This module serves as the main interface layer that orchestrates all other Dungeon Master components:
-
-- **Imports from**: All core modules (parser, generator, updater, utils, change_detector)
-- **Used by**: Console scripts defined in setup.py (`dm` and `dungeon-master` commands)
-- **Integration points**:
-  - Git integration through utils.get_git_changes()
-  - File system operations through ensure_output_directory()
-  - Template generation through generate_context_template()
-  - Validation through validate_context_document()
-  - Change detection through ChangeDetector class
-
-The CLI is the primary way users interact with Dungeon Master, making it a critical component for user experience and adoption.
-
-## Changelog
-
-### [2025-06-02]
-
-- Updated `cli.py` - please review and update context as needed
-
-### [2025-06-02]
-
-- Updated `cli.py` - please review and update context as needed
-
-### [2025-06-02]
-
-- Updated `cli.py` - please review and update context as needed
-
-### [2025-06-02]
-
-- Updated `cli.py` - please review and update context as needed
-
-### [2025-06-02]
-
-- Updated `cli.py` - please review and update context as needed
-
-### [2025-06-02]
-
-- Updated `cli.py` - please review and update context as needed
-
-### [2025-06-02]
-
-- Updated `cli.py` - please review and update context as needed
-
-### [2025-06-02]
-
-- **Enhanced review command messaging**: Added comprehensive guidance for developers on when changes require documentation updates vs. when they can be safely marked as reviewed
-- Added detailed criteria for REVIEW REQUIRED vs. SAFE TO MARK REVIEWED scenarios
-- Improved user experience by clarifying when `dm review --mark-reviewed` is appropriate
-
-### [2025-06-02]
-
-- Context documentation created for CLI module
-- Added comprehensive documentation for all command functions
-- Documented integration points with other modules
+- Used by pre-commit hooks for automated validation
+- Supports both interactive and non-interactive workflows
+- Provides detailed exit codes for CI/CD integration
+- Maintains clear separation between user commands and internal logic
 
 ---
 
-_This document is maintained by Cursor. Last updated: 2025-06-02_
+## Changelog
+
+### [2025-01-01]
+
+- Consolidated multiple inline `import os` statements into single top-level import for better code organization
+- Removed redundant import statements from `cmd_list`, `cmd_validate`, and `cmd_review` functions
+
+### [2025-06-02]
+
+- Implemented stricter change detection that flags ALL content changes as potentially significant
+- Added comprehensive developer guidance with clear criteria for when to review vs. mark as reviewed
+- Enhanced user experience with detailed messaging about change types and appropriate actions
+- Added escape hatch guidance for minor changes (formatting, comments, small fixes)
+
+### [2025-06-02]
+
+- Updated change detection integration to use new ChangeDetector class
+- Improved file discovery logic with proper directory exclusions
+- Enhanced command output formatting with better status indicators
+
+### [2025-06-02]
+
+- Initial CLI implementation with full command structure
+- Implemented core commands: init, update, list, validate, review
+- Added comprehensive help text and command examples
+- Integrated with core Dungeon Master functionality
+
+---
+
+_This document is maintained by Cursor. Last updated: 2025-01-01_
