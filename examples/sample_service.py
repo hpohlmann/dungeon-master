@@ -1,4 +1,4 @@
-# @track_context("sample_service.md")
+# EXAMPLE @example_track_context("sample_service.md")
 """
 Sample authentication service for demonstration.
 Updated comment to test minor changes.
