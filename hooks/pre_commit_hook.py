@@ -26,9 +26,11 @@ from dungeon_master.updater import (
     validate_context_document,
     get_validation_status,
     get_blocking_issues,
-    add_changelog_entry
+    add_changelog_entry,
+    check_for_significant_changes
 )
 from dungeon_master.utils import write_file_content
+from dungeon_master.change_detector import ChangeDetector
 
 # Setup logging
 logging.basicConfig(
@@ -104,7 +106,8 @@ def update_existing_documents(tracked_files: Dict[str, str], output_dir: Path) -
 
 def print_commit_blocked_message(validation_status: Dict[str, Dict[str, any]], 
                                 created_templates: List[str],
-                                blocking_issues: List[str]):
+                                blocking_issues: List[str],
+                                significant_changes: List = None):
     """
     Print a comprehensive message explaining why the commit was blocked.
     
@@ -112,6 +115,7 @@ def print_commit_blocked_message(validation_status: Dict[str, Dict[str, any]],
         validation_status: Validation status for all tracked files
         created_templates: List of newly created templates
         blocking_issues: List of issues blocking the commit
+        significant_changes: List of significant changes detected
     """
     print("\n" + "=" * 70)
     print("🛡️  COMMIT BLOCKED: Context Documentation Required")
@@ -122,32 +126,27 @@ def print_commit_blocked_message(validation_status: Dict[str, Dict[str, any]],
         for template in created_templates:
             print(f"   • dungeon_master/{template}")
     
+    if significant_changes:
+        print("\n🔄 Significant changes detected requiring documentation review:")
+        for change in significant_changes:
+            print(f"\n   📄 {change.file_path}")
+            for change_desc in change.changes:
+                print(f"      • {change_desc}")
+    
     if blocking_issues:
         print("\n❌ Issues requiring attention:")
         for issue in blocking_issues:
             print(f"   • {issue}")
     
     print("\n🎯 Next Steps:")
-    print("   1. Use Cursor to complete the context documentation")
-    print("   2. Fill in all placeholder text marked with parentheses")
-    print("   3. Remove the 'Instructions for Cursor' block when done")
-    print("   4. Commit again once documentation is complete")
+    if created_templates:
+        print("   1. Use Cursor to complete the new context templates")
+    if significant_changes:
+        print("   1. Review and update context documentation for changed files")
+        print("   2. Run 'dm review --mark-reviewed' when documentation is updated")
+    print("   3. Commit again once all issues are resolved")
     
-    # Show specific guidance for each problematic file
-    has_templates = False
-    for file_path, status in validation_status.items():
-        if not status['valid']:
-            if not has_templates:
-                print("\n📋 Template completion guide:")
-                has_templates = True
-            
-            print(f"\n   File: {file_path}")
-            print(f"   Context: dungeon_master/{status['context_doc']}")
-            if status['issues']:
-                print(f"   Issues: {', '.join(status['issues'])}")
-    
-    print("\n💡 Tip: This system helps Cursor maintain accurate, up-to-date")
-    print("   repository documentation as you develop!")
+    print("\n💡 This ensures your documentation stays current with code changes!")
     print("=" * 70)
 
 
@@ -206,6 +205,9 @@ def main() -> int:
         # Ensure output directory exists
         output_dir = ensure_output_directory()
         
+        # Check for significant changes
+        significant_changes, changes_block = check_for_significant_changes(tracked_files)
+        
         # Process new tracked files (create templates)
         created_templates, failed_creations = process_new_tracked_files(tracked_files, output_dir)
         
@@ -216,17 +218,21 @@ def main() -> int:
         # Get validation status for all tracked files
         validation_status = get_validation_status(tracked_files, output_dir)
         
-        # Check for blocking issues
-        blocking_issues = get_blocking_issues(validation_status)
+        # Check for blocking issues (including significant changes)
+        blocking_issues = get_blocking_issues(validation_status, significant_changes)
         
-        if blocking_issues or created_templates:
+        if blocking_issues or created_templates or changes_block:
             # Block the commit and provide guidance
-            print_commit_blocked_message(validation_status, created_templates, blocking_issues)
+            print_commit_blocked_message(validation_status, created_templates, blocking_issues, significant_changes)
             return 1
         
         # If we get here, all validations passed
         # Update existing documents with changelog entries
         updated_documents = update_existing_documents(tracked_files, output_dir)
+        
+        # Save current state for change detection
+        detector = ChangeDetector()
+        detector.save_current_state(list(tracked_files.keys()))
         
         # Print success message
         print_success_message(tracked_files, updated_documents)

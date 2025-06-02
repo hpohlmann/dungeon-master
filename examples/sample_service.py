@@ -1,6 +1,7 @@
 # @track_context("auth_service.md")
 """
 Sample authentication service for demonstration.
+Updated comment to test minor changes.
 """
 
 import hashlib
@@ -69,6 +70,15 @@ class AuthService:
             user_id = payload.get('user_id')
             return user_id in self.active_sessions
         return False
+
+    def refresh_token(self, old_token: str) -> Optional[str]:
+        """Refresh an existing token if it's still valid."""
+        payload = self.verify_token(old_token)
+        if payload:
+            user_id = payload.get('user_id')
+            if user_id in self.active_sessions:
+                return self.generate_token(user_id)
+        return None
 
 
 def create_auth_service(secret: str) -> AuthService:

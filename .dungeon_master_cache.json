@@ -1,0 +1,33 @@
+{
+  "examples/sample_service.py": {
+    "file_path": "examples/sample_service.py",
+    "line_count": 101,
+    "functions": [
+      "login(self, username, password, user_data)",
+      "refresh_token(self, old_token)",
+      "hash_password(self, password)",
+      "verify_token(self, token)",
+      "create_auth_service(secret)",
+      "generate_token(self, user_id, expires_in)",
+      "__init__(self, secret_key)",
+      "is_authenticated(self, token)",
+      "get_session_info(user_id, auth_service)",
+      "verify_password(self, password, hashed)",
+      "validate_user_credentials(username, password)",
+      "logout(self, user_id)"
+    ],
+    "classes": [
+      "AuthService"
+    ],
+    "imports": [
+      "typing.Optional",
+      "jwt",
+      "datetime.timedelta",
+      "hashlib",
+      "typing.Dict",
+      "datetime.datetime",
+      "typing.Any"
+    ],
+    "content_hash": "f6f178e139ecd51437c7c65d1ab9d023"
+  }
+}
