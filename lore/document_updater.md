@@ -1,56 +1,75 @@
 # updater.py - Context Documentation
 
-> **Instructions for Cursor**: This is a context template. Please replace all placeholder text in parentheses with meaningful documentation. Remove this instruction block when complete.
-
 ## Purpose
 
-(Describe the overall intent and responsibility of this file. This Python module contains 8 function(s). What problem does it solve? What is its role in the larger system?)
+This module manages the validation and maintenance of context documents throughout their lifecycle. It focuses on ensuring that generated templates are properly completed by users, validates document quality, manages changelog entries, and coordinates with the change detection system to determine when documentation updates are required. The module serves as the quality gate that ensures documentation standards are maintained.
 
 ## Usage Summary
 
 **File Location**: `dungeon_master/updater.py`
 
 **Primary Use Cases**:
-(List the main scenarios where this file/module is used)
+
+- Validate that context documents have been properly completed by removing placeholders
+- Add automatic changelog entries when tracked files are modified
+- Detect when context documents become stale due to file changes
+- Coordinate with change detection system to manage significant file modifications
+- Provide detailed validation feedback for commit blocking decisions
 
 **Key Dependencies**:
-(Review and document the purpose of these key imports:)
-- `re`: (explain why this dependency is needed)
-- `pathlib.Path`: (explain why this dependency is needed)
-- `typing.Dict`: (explain why this dependency is needed)
-- `typing.List`: (explain why this dependency is needed)
-- `typing.Optional`: (explain why this dependency is needed)
-- ... and 11 more dependencies
+
+- `re`: Regular expression matching for placeholder detection and changelog manipulation
+- `pathlib.Path`: File path operations and validation
+- `typing`: Type hints for Dict, List, Optional, Tuple
+- `logging`: Error reporting and debugging information
+- `utils`: File I/O operations and timestamp formatting
+- `generator`: Placeholder detection functions and validation logic
+- `change_detector`: Integration with significant change detection system
 
 ## Key Functions or Classes
 
-**Key Functions:**
-(Document the most important functions - you don't need to list every function, focus on the key ones:)
-- **validate_context_document(context_doc_path)**: (Explain what this function does and when it's used)
-- **_has_meaningful_content(content)**: (Explain what this function does and when it's used)
-- **add_changelog_entry(context_doc_path, file_path, change_description)**: (Explain what this function does and when it's used)
-- **is_context_document_stale(file_path, context_doc_path)**: (Explain what this function does and when it's used)
-- **get_validation_status(tracked_files, output_dir)**: (Explain what this function does and when it's used)
-- (Document other important functions from the remaining 3)
+**Key Functions**:
 
+- **validate_context_document(context_doc_path)**: Core validation function that checks if a context doc is complete and ready for commit.
+- **add_changelog_entry(context_doc_path, file_path, change_description)**: Automatically maintains changelog sections in context docs when files are modified.
+- **get_validation_status(tracked_files, output_dir)**: Aggregates validation status across all tracked files for comprehensive reporting.
+- **check_for_significant_changes(tracked_files)**: Integrates with change detector to identify files needing doc review.
+- **get_blocking_issues(validation_status, significant_changes)**: Determines what issues would block a commit and provides user guidance.
+- **mark_changes_as_reviewed(tracked_files)**: Approves significant changes after docs have been updated.
 
 ## Usage Notes
 
-(Document important usage patterns, gotchas, or considerations. For example:)
-- (How should other parts of the system interact with this file?)
-- (Are there any important patterns or conventions to follow?)
-- (What are common mistakes or pitfalls to avoid?)
-- (Any performance considerations or limitations?)
+- Validation is comprehensive, checking for unfilled placeholders, instruction blocks, and meaningful content
+- The content meaningfulness check has been tuned to avoid false positives while ensuring quality
+- Changelog management is automatic and maintains chronological order of entries
+- Significant change detection helps prevent documentation from becoming outdated
+- All validation functions provide detailed feedback for user guidance
+- The module integrates tightly with the change detection system for workflow management
+- Validation results include both human-readable messages and structured data for programmatic use
 
 ## Dependencies & Integration
 
-(Describe how this file integrates with other parts of the system. What files import this? What does this file depend on? Are there any important architectural considerations?)
+This module is central to the Dungeon Master quality assurance workflow:
+
+- **Used by**: CLI validate and review commands, pre-commit hook for commit blocking
+- **Uses**: utils for file operations, generator for placeholder detection, change_detector for change analysis
+- **Integration flow**:
+  1. Called during validation phase to check document completeness
+  2. Coordinates with change detector to identify significant modifications
+  3. Provides blocking decisions for commit workflow
+  4. Maintains document changelogs automatically
+  5. Manages the review workflow for significant changes
+
+The updater module ensures that the documentation quality standards are maintained while providing a smooth user experience for managing changes.
 
 ## Changelog
 
 ### [2025-06-02]
-- Context documentation created
-- (Add meaningful changelog entries as the file evolves)
+
+- Context documentation created for document updater module
+- Documented validation logic and change detection integration
+- Added notes about changelog management and commit blocking workflow
 
 ---
-*This document is maintained by Cursor. Last updated: 2025-06-02*
+
+_This document is maintained by Cursor. Last updated: 2025-06-02_

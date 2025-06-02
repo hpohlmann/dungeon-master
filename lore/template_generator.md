@@ -1,56 +1,73 @@
 # generator.py - Context Documentation
 
-> **Instructions for Cursor**: This is a context template. Please replace all placeholder text in parentheses with meaningful documentation. Remove this instruction block when complete.
-
 ## Purpose
 
-(Describe the overall intent and responsibility of this file. This Python module contains 11 function(s). What problem does it solve? What is its role in the larger system?)
+This module is responsible for creating structured context document templates with intelligent placeholders for Cursor to fill. It analyzes source code structure using AST parsing for Python and regex patterns for JavaScript/TypeScript, then generates comprehensive Markdown templates with sections for purpose, usage, functions, and integration details. The generator creates the scaffolding that ensures consistent, thorough documentation across all tracked files.
 
 ## Usage Summary
 
 **File Location**: `dungeon_master/generator.py`
 
 **Primary Use Cases**:
-(List the main scenarios where this file/module is used)
+
+- Generate context document templates from source code analysis
+- Analyze Python files using AST parsing to extract functions, classes, and imports
+- Analyze JavaScript/TypeScript files using regex patterns for basic structure detection
+- Create structured Markdown templates with Cursor-specific placeholders
+- Detect unfilled placeholders in existing context documents for validation
 
 **Key Dependencies**:
-(Review and document the purpose of these key imports:)
-- `ast`: (explain why this dependency is needed)
-- `re`: (explain why this dependency is needed)
-- `pathlib.Path`: (explain why this dependency is needed)
-- `typing.Dict`: (explain why this dependency is needed)
-- `typing.List`: (explain why this dependency is needed)
-- ... and 6 more dependencies
+
+- `ast`: Abstract Syntax Tree parsing for Python source code analysis
+- `re`: Regular expression matching for JavaScript/TypeScript parsing and placeholder detection
+- `pathlib.Path`: File path operations and extension detection
+- `typing`: Type hints for Dict, List, Optional, Set
+- `logging`: Error reporting for parsing failures
+- `utils`: File reading, timestamp formatting, and file extension detection
 
 ## Key Functions or Classes
 
-**Key Functions:**
-(Document the most important functions - you don't need to list every function, focus on the key ones:)
-- **analyze_file_structure(file_path, file_content)**: (Explain what this function does and when it's used)
-- **_analyze_python_structure(file_content)**: (Explain what this function does and when it's used)
-- **_analyze_javascript_structure(file_content)**: (Explain what this function does and when it's used)
-- **generate_context_template(file_path)**: (Explain what this function does and when it's used)
-- **_generate_purpose_template(file_path, analysis)**: (Explain what this function does and when it's used)
-- (Document other important functions from the remaining 6)
+**Key Functions**:
 
+- **generate_context_template(file_path)**: Main entry point that creates a complete context document template by analyzing file structure and generating appropriate sections.
+- **analyze_file_structure(file_path, file_content)**: Dispatches to language-specific analysis functions based on file extension to extract structural information.
+- **\_analyze_python_structure(file_content)**: Uses AST parsing to extract functions, classes, and imports from Python files with full signature analysis.
+- **\_analyze_javascript_structure(file_content)**: Uses regex patterns to extract basic structural elements from JavaScript/TypeScript files.
+- **has_unfilled_placeholders(content)**: Detects whether a context document still contains template placeholders that need completion.
+- **get_unfilled_sections(content)**: Returns specific sections that still need to be filled, used for detailed validation feedback.
 
 ## Usage Notes
 
-(Document important usage patterns, gotchas, or considerations. For example:)
-- (How should other parts of the system interact with this file?)
-- (Are there any important patterns or conventions to follow?)
-- (What are common mistakes or pitfalls to avoid?)
-- (Any performance considerations or limitations?)
+- Python files get sophisticated AST-based analysis with function signatures and complete import tracking
+- JavaScript/TypeScript files use simpler regex-based analysis due to parsing complexity
+- Templates include specific instructions for Cursor about how to complete the documentation
+- All generated templates follow a consistent structure with Purpose, Usage, Functions, Notes, Dependencies, and Changelog sections
+- The placeholder detection is robust and handles various formatting styles
+- File analysis gracefully handles syntax errors in source code
+- Templates are designed to be self-documenting with clear instructions for completion
 
 ## Dependencies & Integration
 
-(Describe how this file integrates with other parts of the system. What files import this? What does this file depend on? Are there any important architectural considerations?)
+This module is central to the template creation workflow:
+
+- **Used by**: CLI update command, pre-commit hook for new tracked files
+- **Uses**: utils for file operations, ast for Python parsing, re for pattern matching
+- **Integration flow**:
+  1. Called when a tracked file needs a new context document
+  2. Analyzes source code structure based on file type
+  3. Generates structured Markdown template with placeholders
+  4. Returns template content for writing to lore/ directory
+
+The generator creates the foundation that other modules validate and update, making it crucial for maintaining documentation quality and consistency.
 
 ## Changelog
 
 ### [2025-06-02]
-- Context documentation created
-- (Add meaningful changelog entries as the file evolves)
+
+- Context documentation created for template generator module
+- Documented AST parsing logic for Python and regex patterns for JavaScript
+- Added notes about placeholder detection and validation integration
 
 ---
-*This document is maintained by Cursor. Last updated: 2025-06-02*
+
+_This document is maintained by Cursor. Last updated: 2025-06-02_

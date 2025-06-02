@@ -1,55 +1,74 @@
 # pre_commit_hook.py - Context Documentation
 
-> **Instructions for Cursor**: This is a context template. Please replace all placeholder text in parentheses with meaningful documentation. Remove this instruction block when complete.
-
 ## Purpose
 
-(Describe the overall intent and responsibility of this file. This Python module contains 5 function(s). What problem does it solve? What is its role in the larger system?)
+This script serves as the enforcement mechanism for Dungeon Master's context documentation requirements, integrating directly with git's pre-commit workflow. It acts as a quality gate that blocks commits when tracked files lack proper context documentation or when significant changes haven't been reviewed. The hook orchestrates all Dungeon Master components to create templates, validate documents, and ensure documentation stays current with code changes.
 
 ## Usage Summary
 
 **File Location**: `hooks/pre_commit_hook.py`
 
 **Primary Use Cases**:
-(List the main scenarios where this file/module is used)
+
+- Block commits when tracked files have incomplete context documentation
+- Generate new context document templates for newly tracked files
+- Validate existing context documents for completeness and quality
+- Detect and enforce review of significant file changes
+- Provide clear user guidance on how to resolve documentation issues
 
 **Key Dependencies**:
-(Review and document the purpose of these key imports:)
-- `sys`: (explain why this dependency is needed)
-- `logging`: (explain why this dependency is needed)
-- `pathlib.Path`: (explain why this dependency is needed)
-- `typing.List`: (explain why this dependency is needed)
-- `typing.Tuple`: (explain why this dependency is needed)
-- ... and 12 more dependencies
+
+- `sys`: Exit code management for commit blocking and path manipulation
+- `logging`: Comprehensive logging for debugging hook execution
+- `pathlib.Path`: File system operations and path handling
+- `typing`: Type hints for List, Tuple, Dict
+- All Dungeon Master modules: parser, generator, updater, utils, change_detector
 
 ## Key Functions or Classes
 
-**Key Functions:**
-(Document the most important functions - you don't need to list every function, focus on the key ones:)
-- **process_new_tracked_files(tracked_files, output_dir)**: (Explain what this function does and when it's used)
-- **update_existing_documents(tracked_files, output_dir)**: (Explain what this function does and when it's used)
-- **print_commit_blocked_message(validation_status, created_templates, blocking_issues, significant_changes)**: (Explain what this function does and when it's used)
-- **print_success_message(tracked_files, updated_documents)**: (Explain what this function does and when it's used)
-- **main()**: (Explain what this function does and when it's used)
+**Key Functions**:
 
+- **main()**: Main entry point that orchestrates the entire pre-commit validation workflow
+- **process_new_tracked_files(tracked_files, output_dir)**: Creates context document templates for files that don't have them yet
+- **update_existing_documents(tracked_files, output_dir)**: Adds changelog entries to existing valid context documents
+- **print_commit_blocked_message()**: Provides comprehensive user guidance when commits are blocked
+- **print_success_message()**: Confirms successful validation and documents what was updated
 
 ## Usage Notes
 
-(Document important usage patterns, gotchas, or considerations. For example:)
-- (How should other parts of the system interact with this file?)
-- (Are there any important patterns or conventions to follow?)
-- (What are common mistakes or pitfalls to avoid?)
-- (Any performance considerations or limitations?)
+- The hook runs automatically on every git commit for repositories with Dungeon Master configured
+- Exit code 0 allows commits to proceed, non-zero exit codes block commits
+- The hook provides detailed feedback about what needs to be fixed before commits can proceed
+- All file processing is done on staged files to avoid interfering with working directory changes
+- The hook gracefully handles repositories without git or with no staged files
+- Error handling is comprehensive to prevent the hook from breaking git workflows
+- The hook integrates with the change detection system to enforce documentation review requirements
 
 ## Dependencies & Integration
 
-(Describe how this file integrates with other parts of the system. What files import this? What does this file depend on? Are there any important architectural considerations?)
+This script is the primary integration point between Dungeon Master and git workflows:
+
+- **Triggered by**: Git pre-commit hooks when commits are attempted
+- **Uses**: All core Dungeon Master modules for complete workflow orchestration
+- **Integration flow**:
+  1. Git triggers the hook before allowing commits
+  2. Hook identifies staged tracked files using the parser
+  3. Creates templates for new tracked files using the generator
+  4. Validates existing documents using the updater
+  5. Checks for significant changes using the change detector
+  6. Blocks commits if any issues are found, or allows them to proceed
+  7. Updates changelogs and cache files when commits are successful
+
+The pre-commit hook ensures that documentation requirements are enforced consistently across all team members and that documentation quality is maintained as part of the development workflow.
 
 ## Changelog
 
 ### [2025-06-02]
-- Context documentation created
-- (Add meaningful changelog entries as the file evolves)
+
+- Context documentation created for pre-commit hook
+- Documented integration with git workflow and commit blocking logic
+- Added notes about user guidance and error handling patterns
 
 ---
-*This document is maintained by Cursor. Last updated: 2025-06-02*
+
+_This document is maintained by Cursor. Last updated: 2025-06-02_

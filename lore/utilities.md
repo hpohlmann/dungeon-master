@@ -1,56 +1,71 @@
 # utils.py - Context Documentation
 
-> **Instructions for Cursor**: This is a context template. Please replace all placeholder text in parentheses with meaningful documentation. Remove this instruction block when complete.
-
 ## Purpose
 
-(Describe the overall intent and responsibility of this file. This Python module contains 7 function(s). What problem does it solve? What is its role in the larger system?)
+This module provides essential utility functions that serve as the foundation for all Dungeon Master operations. It handles core concerns like directory management, file I/O operations, git integration, and cross-platform compatibility. These utilities abstract away low-level details and provide a consistent interface for file system and git operations used throughout the application.
 
 ## Usage Summary
 
 **File Location**: `dungeon_master/utils.py`
 
 **Primary Use Cases**:
-(List the main scenarios where this file/module is used)
+
+- Create and manage the `lore/` output directory for context documents
+- Read and write files safely with proper error handling
+- Interface with git to get staged and new files
+- Determine file types and extensions for processing logic
+- Generate consistent timestamps for changelog entries
 
 **Key Dependencies**:
-(Review and document the purpose of these key imports:)
-- `os`: (explain why this dependency is needed)
-- `subprocess`: (explain why this dependency is needed)
-- `pathlib.Path`: (explain why this dependency is needed)
-- `typing.List`: (explain why this dependency is needed)
-- `typing.Tuple`: (explain why this dependency is needed)
-- ... and 3 more dependencies
+
+- `os`: Low-level operating system interface for file operations
+- `subprocess`: Execute git commands and capture output
+- `pathlib.Path`: Modern, object-oriented path handling
+- `typing`: Type hints for List, Tuple, Optional
+- `logging`: Centralized logging for error reporting and debugging
 
 ## Key Functions or Classes
 
-**Key Functions:**
-(Document the most important functions - you don't need to list every function, focus on the key ones:)
-- **ensure_output_directory()**: (Explain what this function does and when it's used)
-- **get_git_changes()**: (Explain what this function does and when it's used)
-- **read_file_content(file_path)**: (Explain what this function does and when it's used)
-- **write_file_content(file_path, content)**: (Explain what this function does and when it's used)
-- **get_file_extension(file_path)**: (Explain what this function does and when it's used)
-- (Document other important functions from the remaining 2)
+**Key Functions**:
 
+- **ensure_output_directory()**: Creates and returns the `lore/` directory path. Central function that establishes where context documents are stored.
+- **get_git_changes()**: Retrieves staged and new files from git using subprocess calls. Critical for determining which files need processing.
+- **read_file_content(file_path)**: Safely reads file content with comprehensive error handling for encoding issues and missing files.
+- **write_file_content(file_path, content)**: Safely writes content to files, creating parent directories as needed.
+- **is_text_file(file_path)**: Determines if a file should be processed based on its extension, filtering out binary files.
+- **format_timestamp()**: Generates consistent YYYY-MM-DD timestamps for changelog entries and document updates.
 
 ## Usage Notes
 
-(Document important usage patterns, gotchas, or considerations. For example:)
-- (How should other parts of the system interact with this file?)
-- (Are there any important patterns or conventions to follow?)
-- (What are common mistakes or pitfalls to avoid?)
-- (Any performance considerations or limitations?)
+- All file operations include comprehensive error handling and logging for troubleshooting
+- The `ensure_output_directory()` function is idempotent - safe to call multiple times
+- Git operations gracefully handle repositories that aren't initialized or don't have staged files
+- File reading operations handle various encoding issues and binary files gracefully
+- Path operations use `pathlib.Path` for cross-platform compatibility (Windows, macOS, Linux)
+- The module follows the principle of "fail gracefully" - operations return None/empty lists rather than crashing
 
 ## Dependencies & Integration
 
-(Describe how this file integrates with other parts of the system. What files import this? What does this file depend on? Are there any important architectural considerations?)
+This module is the foundational layer used by all other Dungeon Master components:
+
+- **Used by**: CLI, pre-commit hook, parser, generator, updater, change detector
+- **Imports from**: Only standard library modules (no internal dependencies)
+- **Key integration points**:
+  - Output directory management for all context document operations
+  - Git integration for determining which files to process
+  - File I/O abstraction used by template generation and validation
+  - Timestamp generation for changelog maintenance
+
+The utilities module is designed to be the stable foundation that other modules can rely on without circular dependencies.
 
 ## Changelog
 
 ### [2025-06-02]
-- Context documentation created
-- (Add meaningful changelog entries as the file evolves)
+
+- Context documentation created for utilities module
+- Documented all utility functions and their error handling patterns
+- Added notes about cross-platform compatibility considerations
 
 ---
-*This document is maintained by Cursor. Last updated: 2025-06-02*
+
+_This document is maintained by Cursor. Last updated: 2025-06-02_

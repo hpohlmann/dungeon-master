@@ -1,56 +1,72 @@
 # cli.py - Context Documentation
 
-> **Instructions for Cursor**: This is a context template. Please replace all placeholder text in parentheses with meaningful documentation. Remove this instruction block when complete.
-
 ## Purpose
 
-(Describe the overall intent and responsibility of this file. This Python module contains 6 function(s). What problem does it solve? What is its role in the larger system?)
+This module provides the command-line interface for Dungeon Master, serving as the primary entry point for user interactions. It implements a comprehensive CLI with subcommands for initializing repositories, managing context documentation, validating templates, and reviewing significant changes. The module acts as the orchestrator that ties together all other Dungeon Master components to provide a cohesive user experience.
 
 ## Usage Summary
 
 **File Location**: `dungeon_master/cli.py`
 
 **Primary Use Cases**:
-(List the main scenarios where this file/module is used)
+
+- Initialize Dungeon Master in new repositories (`dm init`)
+- Generate and update context doc templates (`dm update`)
+- Show tracked files and their doc status via `dm list`
+- Validate context docs for completeness via `dm validate`
+- Manage and approve significant file changes via `dm review`
 
 **Key Dependencies**:
-(Review and document the purpose of these key imports:)
-- `argparse`: (explain why this dependency is needed)
-- `sys`: (explain why this dependency is needed)
-- `pathlib.Path`: (explain why this dependency is needed)
-- `typing.List`: (explain why this dependency is needed)
-- `typing.Dict`: (explain why this dependency is needed)
-- ... and 13 more dependencies
+
+- `argparse`: Provides robust command-line argument parsing and help generation
+- `sys`: Used for exit codes and system-level operations
+- `pathlib.Path`: Modern path handling for cross-platform file operations
+- `typing.List`, `typing.Dict`: Type hints for better code maintainability
+- Internal modules: Imports core functionality from parser, generator, updater, and utils
 
 ## Key Functions or Classes
 
-**Key Functions:**
-(Document the most important functions - you don't need to list every function, focus on the key ones:)
-- **cmd_update(args)**: (Explain what this function does and when it's used)
-- **cmd_list(args)**: (Explain what this function does and when it's used)
-- **cmd_validate(args)**: (Explain what this function does and when it's used)
-- **cmd_init(args)**: (Explain what this function does and when it's used)
-- **cmd_review(args)**: (Explain what this function does and when it's used)
-- (Document other important functions from the remaining 1)
+**Key Functions**:
 
+- **cmd_update(args)**: Creates templates or validates existing context docs for tracked files. Handles both specific files and staged files from git.
+- **cmd_list(args)**: Shows tracked files and their context doc status. Supports `--all` flag to show all tracked files vs just staged ones.
+- **cmd_validate(args)**: Validates context docs and shows what would block a commit. Checks for incomplete templates and significant changes.
+- **cmd_init(args)**: Initializes Dungeon Master in the current repository. Creates output directory and sample pre-commit configuration.
+- **cmd_review(args)**: Manages significant change detection. Allows checking changes and marking them as approved with --mark-reviewed.
+- **main()**: Entry point that sets up argument parsing with subcommands and delegates to appropriate command handlers.
 
 ## Usage Notes
 
-(Document important usage patterns, gotchas, or considerations. For example:)
-- (How should other parts of the system interact with this file?)
-- (Are there any important patterns or conventions to follow?)
-- (What are common mistakes or pitfalls to avoid?)
-- (Any performance considerations or limitations?)
+- The CLI follows standard Unix conventions with clear help messages and appropriate exit codes
+- All commands that modify files provide clear feedback about what was created or updated
+- Error handling is comprehensive with user-friendly messages for common failure scenarios
+- The `validate` command serves as a dry-run to show what the pre-commit hook would do
+- Commands automatically detect git repository context and work with staged files when appropriate
+- The CLI is designed to be both interactive (for developers) and scriptable (for automation)
 
 ## Dependencies & Integration
 
-(Describe how this file integrates with other parts of the system. What files import this? What does this file depend on? Are there any important architectural considerations?)
+This module serves as the main interface layer that orchestrates all other Dungeon Master components:
+
+- **Imports from**: All core modules (parser, generator, updater, utils, change_detector)
+- **Used by**: Console scripts defined in setup.py (`dm` and `dungeon-master` commands)
+- **Integration points**:
+  - Git integration through utils.get_git_changes()
+  - File system operations through ensure_output_directory()
+  - Template generation through generate_context_template()
+  - Validation through validate_context_document()
+  - Change detection through ChangeDetector class
+
+The CLI is the primary way users interact with Dungeon Master, making it a critical component for user experience and adoption.
 
 ## Changelog
 
 ### [2025-06-02]
-- Context documentation created
-- (Add meaningful changelog entries as the file evolves)
+
+- Context documentation created for CLI module
+- Added comprehensive documentation for all command functions
+- Documented integration points with other modules
 
 ---
-*This document is maintained by Cursor. Last updated: 2025-06-02*
+
+_This document is maintained by Cursor. Last updated: 2025-06-02_

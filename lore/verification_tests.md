@@ -1,56 +1,72 @@
 # verify_installation.py - Context Documentation
 
-> **Instructions for Cursor**: This is a context template. Please replace all placeholder text in parentheses with meaningful documentation. Remove this instruction block when complete.
-
 ## Purpose
 
-(Describe the overall intent and responsibility of this file. This Python module contains 7 function(s). What problem does it solve? What is its role in the larger system?)
+This module provides lightweight verification testing for Dungeon Master core functionality without requiring external dependencies. It serves as a quick sanity check that can be run immediately after installation to ensure all components are working correctly. The verification tests focus on the most critical functionality paths and provide confidence that the system is ready for use in production environments.
 
 ## Usage Summary
 
 **File Location**: `tests/verify_installation.py`
 
 **Primary Use Cases**:
-(List the main scenarios where this file/module is used)
+
+- Quick verification that all modules can be imported correctly
+- Test core parser functionality with sample decorator detection
+- Validate template generation and placeholder detection
+- Verify document validation logic with realistic examples
+- Provide immediate feedback on installation success or failure
 
 **Key Dependencies**:
-(Review and document the purpose of these key imports:)
-- `sys`: (explain why this dependency is needed)
-- `os`: (explain why this dependency is needed)
-- `pathlib.Path`: (explain why this dependency is needed)
-- `dungeon_master.parse_tracked_files`: (explain why this dependency is needed)
-- `dungeon_master.generate_context_template`: (explain why this dependency is needed)
-- ... and 11 more dependencies
+
+- `sys`: Python interpreter access and path manipulation for importing local modules
+- `os`: Operating system interface for file creation and cleanup
+- `pathlib.Path`: Modern path handling for temporary file operations
+- Standard library only: Designed to avoid external dependencies for maximum portability
 
 ## Key Functions or Classes
 
-**Key Functions:**
-(Document the most important functions - you don't need to list every function, focus on the key ones:)
-- **test_imports()**: (Explain what this function does and when it's used)
-- **test_parser()**: (Explain what this function does and when it's used)
-- **test_template_generator()**: (Explain what this function does and when it's used)
-- **test_validation()**: (Explain what this function does and when it's used)
-- **test_cli_functionality()**: (Explain what this function does and when it's used)
-- (Document other important functions from the remaining 2)
+**Key Functions**:
 
+- **test_imports()**: Validates that all Dungeon Master modules can be imported and reports version information
+- **test_parser()**: Tests decorator extraction and context document name validation with sample content
+- **test_template_generator()**: Creates sample files, generates templates, and validates placeholder detection
+- **test_validation()**: Tests document validation logic with both complete and incomplete templates
+- **test_cli_functionality()**: Verifies that CLI entry points can be imported and are callable
+- **test_directory_creation()**: Validates output directory creation and management
+- **main()**: Test runner that executes all verification tests with detailed reporting
 
 ## Usage Notes
 
-(Document important usage patterns, gotchas, or considerations. For example:)
-- (How should other parts of the system interact with this file?)
-- (Are there any important patterns or conventions to follow?)
-- (What are common mistakes or pitfalls to avoid?)
-- (Any performance considerations or limitations?)
+- Tests create temporary files that are automatically cleaned up after testing
+- All test operations are designed to be side-effect free and safe to run repeatedly
+- The verification focuses on "happy path" scenarios rather than exhaustive edge case testing
+- Tests provide clear success/failure indicators with descriptive error messages
+- The module can be run standalone or integrated into CI/CD pipelines for automated verification
+- Memory and disk usage is minimal, making it suitable for resource-constrained environments
 
 ## Dependencies & Integration
 
-(Describe how this file integrates with other parts of the system. What files import this? What does this file depend on? Are there any important architectural considerations?)
+This verification module provides confidence in the overall system health:
+
+- **Tests**: Core functionality across all major Dungeon Master modules
+- **Uses**: Only standard library modules for maximum compatibility
+- **Integration approach**:
+  1. Import verification ensures all modules load correctly
+  2. Functional testing validates core workflows work end-to-end
+  3. File operations testing ensures I/O reliability
+  4. CLI testing confirms user interface availability
+  5. Cleanup ensures no test artifacts remain
+
+The verification tests serve as a bridge between development testing and production deployment confidence.
 
 ## Changelog
 
 ### [2025-06-02]
-- Context documentation created
-- (Add meaningful changelog entries as the file evolves)
+
+- Context documentation created for verification tests
+- Documented lightweight testing approach and dependency minimization
+- Added notes about production deployment confidence and CI/CD integration
 
 ---
-*This document is maintained by Cursor. Last updated: 2025-06-02*
+
+_This document is maintained by Cursor. Last updated: 2025-06-02_
