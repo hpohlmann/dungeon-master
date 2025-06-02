@@ -1,3 +1,4 @@
+# @track_context("document_updater.md")
 """
 Updater module for validating context documents and managing updates.
 Focuses on validation rather than content generation.

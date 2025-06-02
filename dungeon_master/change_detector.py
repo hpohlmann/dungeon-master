@@ -1,3 +1,4 @@
+# @track_context("change_detector.md")
 """
 Change detection module for identifying significant file modifications.
 """

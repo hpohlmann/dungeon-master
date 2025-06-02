@@ -1,3 +1,4 @@
+# @track_context("template_generator.md")
 """
 Generator module for creating context document templates.
 Creates structured templates with placeholders for Cursor to fill.

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# @track_context("installation_tests.md")
 """
 Quick test script to verify Dungeon Master installation.
 Run this after installing the package to ensure everything works.

@@ -1,3 +1,4 @@
+# @track_context("cli.md")
 """
 Command-line interface for Dungeon Master.
 """

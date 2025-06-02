@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# @track_context("pre_commit_hook.md")
 """
 Pre-commit hook for Dungeon Master context tracking.
 

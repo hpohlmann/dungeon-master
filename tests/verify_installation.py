@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# @track_context("verification_tests.md")
 """
 Verification script for Dungeon Master installation.
 Tests core functionality without requiring external dependencies.
