@@ -192,7 +192,7 @@ class ChangeAnalysis:
 class ChangeDetector:
     """Detects significant changes in tracked files."""
     
-    def __init__(self, cache_file: str = ".dungeon_master_cache.json"):
+    def __init__(self, cache_file: str = "lore_cache.json"):
         self.cache_file = Path(cache_file)
         self.cached_signatures = self._load_cache()
     

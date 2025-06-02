@@ -190,7 +190,7 @@ def test_directory_creation():
         
         output_dir = ensure_output_directory()
         assert output_dir.exists()
-        assert output_dir.name == "dungeon_master"
+        assert output_dir.name == "lore"
         
         print("✓ Directory creation tests passed")
         return True

@@ -28,7 +28,7 @@ class AuthService:
 
 ### 2. **Template Generation**
 
-When you commit a tracked file, Dungeon Master creates a template in `/dungeon_master/`:
+When you commit a tracked file, Dungeon Master creates a template in `/lore/`:
 
 ```markdown
 # auth_service.py - Context Documentation
@@ -69,7 +69,7 @@ The commit is **blocked** with a helpful message:
 🛡️  COMMIT BLOCKED: Context Documentation Required
 ================================================================
 📝 New context templates created:
-   • dungeon_master/auth_service.md
+   • lore/auth_service.md
 
 🎯 Next Steps:
    1. Use Cursor to complete the context documentation
@@ -200,7 +200,7 @@ Generated templates include:
 
 ```
 your_project/
-├── dungeon_master/           # Generated context documents
+├── lore/                     # Generated context documents
 │   ├── auth_service.md       # ✓ Completed by Cursor
 │   ├── api_client.md         # ⚠️ Needs completion
 │   └── utils.md              # ✓ Completed
@@ -227,24 +227,51 @@ Add to your `.pre-commit-config.yaml`:
 
 ```yaml
 repos:
-  - repo: https://github.com/yourusername/dungeon-master
-    rev: v0.1.0
-    hooks:
-      - id: dungeon-master
-```
-
-Or for local development:
-
-```yaml
-repos:
   - repo: local
     hooks:
-      - id: dungeon-master
-        name: Dungeon Master Context Tracking
-        entry: python hooks/pre_commit_hook.py
-        language: system
+      - id: cursor-dungeon-master
+        name: "🛡️ Cursor Dungeon Master"
+        entry: dm
+        args: [validate]
+        language: python
         pass_filenames: false
         always_run: true
+```
+
+### Demo Configurations
+
+We provide two ready-to-use pre-commit configurations:
+
+#### 🚀 **Basic Setup** (`.pre-commit-config-basic.yaml`)
+
+Minimal configuration with essential hooks:
+
+- File cleanup and validation
+- Python linting with Ruff
+- Dungeon Master documentation enforcement
+
+#### 🔧 **Complete Setup** (`.pre-commit-config-demo.yaml`)
+
+Comprehensive configuration including:
+
+- All basic hooks plus advanced Python tooling
+- MyPy type checking
+- Security scanning with Bandit
+- Additional code quality checks
+- Prettier for JSON/YAML/Markdown formatting
+
+**Quick Start:**
+
+```bash
+# Copy your preferred config
+cp .pre-commit-config-basic.yaml .pre-commit-config.yaml
+# OR
+cp .pre-commit-config-demo.yaml .pre-commit-config.yaml
+
+# Install and set up
+pip install pre-commit cursor-dungeon-master
+pre-commit install
+dm init
 ```
 
 ## 🧠 Philosophy: AI-Assisted Documentation
@@ -311,7 +338,7 @@ make demo  # See the system in action
 - Pre-commit hook now validates both template completion AND significant changes
 - Developers must review significant changes before commits proceed
 - Context documentation updates are enforced when code changes substantially
-- Cache system (`.dungeon_master_cache.json`) tracks file signatures
+- Cache system (`lore_cache.json`) tracks file signatures
 
 **✨ Benefits:**
 

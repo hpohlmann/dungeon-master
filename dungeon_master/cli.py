@@ -205,7 +205,7 @@ def cmd_validate(args) -> int:
         print("\n📝 Use Cursor to complete the documentation:")
         for file_path, status in validation_status.items():
             if not status['valid']:
-                print(f"   • dungeon_master/{status['context_doc']}")
+                print(f"   • lore/{status['context_doc']}")
         
         if significant_changes:
             print("\n🔄 To resolve significant changes:")

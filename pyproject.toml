@@ -57,8 +57,7 @@ packages = ["dungeon_master"]
 [tool.setuptools.dynamic]
 version = {attr = "dungeon_master.__version__"}
 
-[tool.setuptools.package-data]
-dungeon_master = ["py.typed"]
+
 
 [tool.black]
 line-length = 88

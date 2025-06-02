@@ -93,7 +93,7 @@ class TestClass:
                 return False
             
             # Check if template was created
-            template_path = Path("dungeon_master/test_module.md")
+            template_path = Path("lore/test_module.md")
             if template_path.exists():
                 print("✅ Template creation works")
                 print(f"📄 Created: {template_path}")

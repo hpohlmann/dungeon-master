@@ -274,3 +274,7 @@ local/
 .cache/
 cache/
 .ruff_cache/
+
+# Dungeon Master cache files
+lore_cache.json
+.dungeon_master_cache.json

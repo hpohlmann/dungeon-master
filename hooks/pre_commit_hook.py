@@ -124,7 +124,7 @@ def print_commit_blocked_message(validation_status: Dict[str, Dict[str, any]],
     if created_templates:
         print("\n📝 New context templates created:")
         for template in created_templates:
-            print(f"   • dungeon_master/{template}")
+            print(f"   • lore/{template}")
     
     if significant_changes:
         print("\n🔄 Significant changes detected requiring documentation review:")

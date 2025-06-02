@@ -60,9 +60,6 @@ setup(
         ],
     },
     include_package_data=True,
-    package_data={
-        "dungeon_master": ["py.typed"],
-    },
     keywords="documentation git pre-commit context tracking",
     project_urls={
         "Bug Reports": "https://github.com/yourusername/dungeon-master/issues",

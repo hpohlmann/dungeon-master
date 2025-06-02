@@ -13,12 +13,12 @@ logger = logging.getLogger(__name__)
 
 def ensure_output_directory() -> Path:
     """
-    Ensure the /dungeon_master/ output directory exists.
+    Ensure the /lore/ output directory exists.
     
     Returns:
-        Path: The path to the output directory
+        Path: The path to the lore directory
     """
-    output_dir = Path("dungeon_master")
+    output_dir = Path("lore")
     output_dir.mkdir(exist_ok=True)
     return output_dir
 
