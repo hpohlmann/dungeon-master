@@ -1,378 +1,286 @@
-# Dungeon Master
+# 🏰 Dungeon Master
 
-A context-tracking pre-commit tool designed for **Cursor AI integration**. Creates a structured workflow where Cursor collaborates with developers to maintain accurate, up-to-date repository documentation.
+**A context-tracking pre-commit tool for Cursor AI integration.**
 
-## 🎯 Core Philosophy
+Blocks commits until meaningful documentation exists. Creates structured templates that Cursor fills with intelligent content. Enforces quality through automated validation.
 
-**This is NOT an auto-documentation generator.** Instead, Dungeon Master is a **scaffolding and enforcement system** that:
+```bash
+pip install cursor-dungeon-master
+dm init
+```
 
-- 🛡️ **Blocks commits** when tracked files lack proper context documentation
-- 📋 **Generates templates** with Cursor-specific placeholders and instructions
-- ✅ **Validates completion** to ensure meaningful documentation exists
-- 🔄 **Enforces consistency** through structured, commit-aware workflows
+---
 
-## How It Works
+## ⚔️ How It Works
 
-### 1. **File Tracking**
+### 1. **Track Important Files**
 
-Add a simple decorator to any file you want to track:
+Add a simple decorator to mark files for documentation:
 
 ```python
 # @track_context("auth_service.md")
-
 class AuthService:
     def authenticate(self, token: str) -> bool:
-        # Your code here
         pass
 ```
 
-### 2. **Template Generation**
+### 2. **Commit Triggers Template Creation**
 
-When you commit a tracked file, Dungeon Master creates a template in `/lore/`:
+When you commit, Dungeon Master creates a structured template:
 
 ```markdown
 # auth_service.py - Context Documentation
 
-> **Instructions for Cursor**: This is a context template. Please replace all placeholder text in parentheses with meaningful documentation. Remove this instruction block when complete.
+## Purpose
+
+<Describe the overall intent and responsibility>
+
+## Key Functions
+
+- **authenticate(token)**: <Explain purpose and usage>
+- **generate_token(user_id)**: <Explain purpose and usage>
+
+## Dependencies
+
+- `jwt`: <Why this dependency is needed>
+```
+
+### 3. **🛡️ Commit Blocked Until Complete**
+
+```
+⚔️ COMMIT BLOCKED: Documentation Required
+📜 Templates created: lore/auth_service.md
+🧙‍♂️ Use Cursor to complete documentation
+```
+
+### 4. **🧙‍♂️ Cursor Fills Templates**
+
+Use Cursor to replace placeholders with meaningful content:
+
+```markdown
+## Purpose
+
+Provides JWT-based authentication with secure password hashing
+and session management for user login workflows.
+
+## Key Functions
+
+- **authenticate(token)**: Validates JWT tokens and returns user data
+- **generate_token(user_id)**: Creates signed JWT tokens for authenticated users
+```
+
+### 5. **✅ Validation Passes, Commit Proceeds**
+
+```
+🏰 Dungeon Master: All validations passed
+📜 Documentation complete and validated
+⚡ Commit proceeding...
+```
+
+---
+
+## 🎯 Quick Start
+
+```bash
+# Install
+pip install cursor-dungeon-master
+
+# Initialize in your repo
+dm init
+pre-commit install
+
+# Mark files for tracking
+echo '# @track_context("my_feature.md")' >> src/my_feature.py
+
+# Commit triggers the workflow
+git add . && git commit -m "Add new feature"
+```
+
+**That's it!** Dungeon Master will guide you through the rest.
+
+---
+
+## 🗡️ Commands
+
+| Command         | Purpose                                      |
+| --------------- | -------------------------------------------- |
+| `dm init`       | 🏰 Initialize Dungeon Master in repository   |
+| `dm update`     | 📜 Create/update templates for tracked files |
+| `dm list --all` | 🗺️ Show all tracked files and status         |
+| `dm validate`   | 🛡️ Check what would block commits            |
+| `dm review`     | 🔮 Manage significant changes                |
+
+---
+
+## 📜 Template Example
+
+**Generated Template:**
+
+```markdown
+# auth_service.py - Context Documentation
 
 ## Purpose
 
-(Describe the overall intent and responsibility of this file. This Python module contains 1 class(es) and 10 function(s). What problem does it solve? What is its role in the larger system?)
+<Describe the overall intent and responsibility of this file>
 
 ## Usage Summary
 
 **File Location**: `src/auth_service.py`
 
 **Key Dependencies**:
-(Review and document the purpose of these key imports:)
 
-- `jwt`: (explain why this dependency is needed)
-- `hashlib`: (explain why this dependency is needed)
+- `jwt`: <explain why needed>
+- `hashlib`: <explain why needed>
 
-## Key Functions or Classes
+## Key Functions
 
-**Classes:**
+- **authenticate(self, token)**: <Explain purpose>
+- **generate_token(self, user_id)**: <Explain purpose>
 
-- **AuthService**: (Describe the purpose and responsibility of this class)
+## Integration Notes
 
-**Key Functions:**
-
-- **authenticate(self, token)**: (Explain what this function does and when it's used)
-- **generate_token(self, user_id)**: (Explain what this function does and when it's used)
+<How this integrates with the broader system>
 ```
 
-### 3. **Commit Blocking**
-
-The commit is **blocked** with a helpful message:
-
-```
-🛡️  COMMIT BLOCKED: Context Documentation Required
-================================================================
-📝 New context templates created:
-   • lore/auth_service.md
-
-🎯 Next Steps:
-   1. Use Cursor to complete the context documentation
-   2. Fill in all placeholder text marked with parentheses
-   3. Remove the 'Instructions for Cursor' block when done
-   4. Commit again once documentation is complete
-```
-
-### 4. **Cursor Integration**
-
-Use Cursor to fill out the template with meaningful content:
+**After Cursor Completion:**
 
 ```markdown
+# auth_service.py - Context Documentation
+
 ## Purpose
 
-This module provides a comprehensive authentication service for handling user login,
-token management, and session tracking. It serves as the core security component
-for user authentication workflows, implementing JWT-based authentication with
-secure password hashing and session management capabilities.
+Comprehensive authentication service handling user login, JWT token
+management, and secure session tracking. Core security component
+for all user authentication workflows.
 
 ## Usage Summary
 
-**Primary Use Cases**:
-
-- User authentication and login workflows
-- JWT token generation and validation
-- Password hashing and verification
-- Session management and tracking
+**File Location**: `src/auth_service.py`
 
 **Key Dependencies**:
 
-- `jwt`: Provides JWT token encoding/decoding functionality
-- `hashlib`: Used for secure SHA-256 password hashing
+- `jwt`: Provides JWT encoding/decoding for stateless authentication
+- `hashlib`: SHA-256 password hashing for secure credential storage
+
+## Key Functions
+
+- **authenticate(self, token)**: Validates JWT tokens, returns user data or raises AuthError
+- **generate_token(self, user_id)**: Creates signed JWT with user claims and expiration
+
+## Integration Notes
+
+Used by API middleware for request authentication. Integrates with
+user service for credential validation and session management.
 ```
 
-### 5. **Validation & Success**
+---
 
-Once completed, the commit proceeds with updated documentation:
-
-```
-✅ Dungeon Master Context Tracking: All validations passed
-   📊 Processed 1 tracked file(s)
-   📝 Updated 1 context document(s)
-   🎯 Repository context documentation is up to date!
-```
-
-## 🚀 Quick Start
-
-### Installation
-
-```bash
-pip install cursor-dungeon-master
-```
-
-### Initialize
-
-```bash
-dm init
-pre-commit install
-```
-
-### Track Files
-
-Add the tracking decorator to any important file:
-
-```python
-# @track_context("my_component.md")
-```
-
-### Commit Workflow
-
-1. **Commit tracked files** → Templates created, commit blocked
-2. **Use Cursor** to fill templates with meaningful documentation
-3. **Commit again** → Validation passes, documentation updated
-
-## 📋 CLI Commands
-
-### Process Templates
-
-```bash
-# Create templates for staged files
-dm update
-
-# Process specific files
-dm update src/auth.py src/utils.py
-```
-
-### Check Status
-
-```bash
-# List tracked files and their documentation status
-dm list --all
-
-# Validate what would block commits
-dm validate
-```
-
-### Initialize Repository
-
-```bash
-# Set up Dungeon Master in current repo
-dm init
-```
-
-## 🔍 Validation Rules
-
-Commits are blocked when context documents:
-
-- ❌ **Don't exist** (templates need to be created)
-- ❌ **Contain placeholders** like `(Describe the purpose...)`
-- ❌ **Have instruction blocks** for Cursor still present
-- ❌ **Lack meaningful content** beyond template structure
-
-✅ **Commits proceed** when all tracked files have complete, validated documentation.
-
-## 🏗️ Template Structure
-
-Generated templates include:
-
-- **Purpose**: Overall intent and responsibility
-- **Usage Summary**: File location, use cases, dependencies
-- **Key Functions/Classes**: Main components with descriptions
-- **Usage Notes**: Patterns, gotchas, considerations
-- **Dependencies & Integration**: How it fits in the system
-- **Changelog**: Auto-maintained history
-
-## 📁 Directory Structure
+## 🏺 Project Structure
 
 ```
 your_project/
-├── lore/                     # Generated context documents
-│   ├── auth_service.md       # ✓ Completed by Cursor
-│   ├── api_client.md         # ⚠️ Needs completion
-│   └── utils.md              # ✓ Completed
-├── src/
-│   ├── auth.py              # @track_context("auth_service.md")
-│   ├── client.js            # @track_context("api_client.md")
-│   └── utils.py             # @track_context("utils.md")
-├── hooks/
-│   └── pre_commit_hook.py   # Pre-commit enforcement
-└── .pre-commit-config.yaml
+├── 📜 lore/                    # Generated documentation
+│   ├── auth_service.md         # ✅ Complete
+│   ├── api_client.md          # ⚠️ Needs completion
+│   └── utils.md               # ✅ Complete
+├── 🏹 src/
+│   ├── auth.py                # @track_context("auth_service.md")
+│   ├── client.js              # @track_context("api_client.md")
+│   └── utils.py               # @track_context("utils.md")
+└── ⚔️ hooks/
+    └── pre_commit_hook.py     # Enforcement engine
 ```
 
-## 🎨 Language Support
+---
 
-- **Python** (.py) - Full AST analysis for intelligent templates
-- **JavaScript/TypeScript** (.js, .ts, .jsx, .tsx) - Regex-based parsing
-- **Other Languages** - Basic file analysis with manual completion
+## 🛡️ Validation Rules
 
-## ⚙️ Configuration
+| Status         | Rule                           | Action                          |
+| -------------- | ------------------------------ | ------------------------------- |
+| ⚔️ **BLOCKED** | Template missing               | Creates template, blocks commit |
+| ⚔️ **BLOCKED** | Contains `<placeholders>`      | Must complete with Cursor       |
+| ⚔️ **BLOCKED** | Significant changes unreviewed | Run `dm review --mark-reviewed` |
+| ✅ **PASSES**  | All documentation complete     | Commit proceeds                 |
 
-### Pre-commit Integration
+---
 
-Add to your `.pre-commit-config.yaml`:
+## 🔮 Advanced Features
+
+### 🎲 Change Detection
+
+Automatically detects significant code changes:
+
+```bash
+🔮 Significant changes detected:
+   📄 auth_service.py
+      • New function: validate_permissions()
+      • Modified function: authenticate()
+
+💎 Use 'dm review --mark-reviewed' if changes are minor
+⚔️ Update documentation if changes affect core functionality
+```
+
+### 🧙‍♂️ Language Support
+
+- **🐍 Python**: Full AST analysis with intelligent templates
+- **⚡ JavaScript/TypeScript**: Advanced regex parsing
+- **🗡️ Other Languages**: Basic analysis with manual completion
+
+### 🏰 Pre-commit Integration
 
 ```yaml
 repos:
   - repo: local
     hooks:
-      - id: cursor-dungeon-master
-        name: "🛡️ Cursor Dungeon Master"
-        entry: dm
-        args: [validate]
+      - id: dungeon-master
+        name: "🏰 Dungeon Master"
+        entry: dm validate
         language: python
-        pass_filenames: false
         always_run: true
 ```
 
-### Demo Configurations
+---
 
-We provide two ready-to-use pre-commit configurations:
+## 🌟 Philosophy
 
-#### 🚀 **Basic Setup** (`.pre-commit-config-basic.yaml`)
+**This isn't auto-documentation.** It's a **structured collaboration** between:
 
-Minimal configuration with essential hooks:
+- 🧙‍♂️ **AI (Cursor)** - Provides intelligence and content
+- 🏰 **Dungeon Master** - Enforces structure and consistency
+- ⚔️ **Developers** - Maintain control and oversight
+- 📜 **Documentation** - Stays current through commit-time enforcement
 
-- File cleanup and validation
-- Python linting with Ruff
-- Dungeon Master documentation enforcement
+**Result**: Documentation that's meaningful, current, consistent, and enforced.
 
-#### 🔧 **Complete Setup** (`.pre-commit-config-demo.yaml`)
+---
 
-Comprehensive configuration including:
-
-- All basic hooks plus advanced Python tooling
-- MyPy type checking
-- Security scanning with Bandit
-- Additional code quality checks
-- Prettier for JSON/YAML/Markdown formatting
-
-**Quick Start:**
-
-```bash
-# Copy your preferred config
-cp .pre-commit-config-basic.yaml .pre-commit-config.yaml
-# OR
-cp .pre-commit-config-demo.yaml .pre-commit-config.yaml
-
-# Install and set up
-pip install pre-commit cursor-dungeon-master
-pre-commit install
-dm init
-```
-
-## 🧠 Philosophy: AI-Assisted Documentation
-
-Dungeon Master creates a **structured integration point** where:
-
-- 🤖 **AI (Cursor)** provides the intelligence and content
-- 🛠️ **The system** provides structure, enforcement, and consistency
-- 👨‍💻 **Developers** maintain control and oversight
-- 📈 **Documentation** stays current through commit-time enforcement
-
-This approach ensures documentation is:
-
-- **Meaningful** (written by AI that understands code)
-- **Current** (updated every time code changes)
-- **Consistent** (follows the same structure)
-- **Enforced** (can't be skipped or forgotten)
-
-## 🔧 Development
-
-### Setup
+## 🗺️ Development
 
 ```bash
 git clone https://github.com/yourusername/dungeon-master.git
 cd dungeon-master
 pip install -e .[dev]
+python tests/verify_installation.py
 ```
-
-### Test
-
-```bash
-python verify_installation.py
-make test
-```
-
-### Demo
-
-```bash
-make demo  # See the system in action
-```
-
-## 🗺️ Roadmap
-
-- [ ] **Git Integration**: Better change detection and diff analysis
-- [ ] **AI Enhancement**: Integration with multiple AI providers
-- [ ] **Configuration**: Customizable templates and validation rules
-- [ ] **Analytics**: Documentation coverage and quality metrics
-- [ ] **IDE Plugins**: Direct integration with VSCode, IntelliJ, etc.
-
-## 📝 Changelog
-
-### Version 0.2.0 - Significant Change Detection
-
-**🔄 New Features:**
-
-- **Significant Change Detection**: Automatically detects when tracked files have substantial changes (new/removed functions, classes, major modifications)
-- **Review Workflow**: New `dm review` command to manage significant changes
-- **Smart Commit Blocking**: Commits are blocked when significant changes haven't been reviewed
-- **File Signature Caching**: Intelligent caching system to track file changes over time
-- **Enhanced CLI**: Added `dm review --mark-reviewed` to approve changes
-
-**🎯 Workflow Updates:**
-
-- Pre-commit hook now validates both template completion AND significant changes
-- Developers must review significant changes before commits proceed
-- Context documentation updates are enforced when code changes substantially
-- Cache system (`lore_cache.json`) tracks file signatures
-
-**✨ Benefits:**
-
-- Ensures documentation stays current with code evolution
-- Prevents outdated documentation from becoming stale
-- Human-in-the-loop approval for substantial changes
-- Maintains documentation quality through the development lifecycle
-
-### Version 0.1.0 - Initial Release
-
-**🚀 Core Features:**
-
-- File tracking with `@track_context("filename.md")` decorators
-- Template generation with Cursor-specific placeholders
-- Commit blocking until templates are completed
-- CLI commands (`dm init`, `dm update`, `dm list`, `dm validate`)
-- Pre-commit hook integration
-- Multi-language support (Python, JavaScript, TypeScript)
-
-## 📄 License
-
-MIT License - see LICENSE file for details.
-
-## 🤝 Contributing
-
-This tool is designed to evolve with AI coding practices. Contributions welcome for:
-
-- Enhanced language support
-- Better validation logic
-- Improved template generation
-- AI provider integrations
 
 ---
 
-**💡 Remember**: This isn't about generating docs automatically—it's about creating a structured way for AI assistants like Cursor to help you maintain accurate, meaningful documentation as part of your development workflow.
-# Testing simplified pre-commit hook
-# Final test of simplified pre-commit workflow
+## 🎯 Roadmap
+
+- 🔮 **Enhanced AI Integration** - Multiple AI provider support
+- 🗺️ **Advanced Analytics** - Documentation coverage metrics
+- ⚡ **IDE Plugins** - VSCode and IntelliJ integration
+- 🏹 **Custom Templates** - Configurable documentation structures
+- 💎 **Quality Metrics** - Documentation completeness scoring
+
+---
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+---
+
+**💎 Remember**: This creates a structured way for AI assistants like Cursor to help you maintain accurate, meaningful documentation as part of your development workflow.
+
+🏰 _"In the dungeon of development, proper documentation is your most powerful spell."_
