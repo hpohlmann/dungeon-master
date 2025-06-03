@@ -19,6 +19,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.1] - 2025-01-01 ⚔️
+
+### 🔧 **Critical Bug Fix**
+
+#### 🛡️ **Virtual Environment Protection**
+
+- **MAJOR BUG FIX**: Fixed critical issue where virtual environment files were incorrectly flagged as tracked files
+- **Smart Directory Exclusion**: Added comprehensive logic to exclude virtual environments (`venv`, `.venv`, `env`, `virtualenv`, `pyenv`, `conda`, etc.)
+- **Build Directory Filtering**: Enhanced exclusion of build directories (`node_modules`, `__pycache__`, `dist`, `build`, etc.)
+- **IDE Directory Exclusion**: Added filtering for IDE directories (`.vscode`, `.idea`, `.eclipse`, etc.)
+
+#### ⚡ **Performance & User Experience**
+
+- **Efficient File Walking**: Uses in-place directory filtering to avoid walking into excluded directories
+- **Centralized Discovery**: New `_get_all_project_files()` function provides consistent file discovery across all commands
+- **Enhanced User Experience**: Users no longer see false positives from installed packages in their virtual environments
+- **Cross-Platform Compatibility**: Handles both Unix (`./`) and Windows (`.\`) path separators
+
+### 🏹 **Technical Implementation**
+
+- Added `_should_exclude_directory()` function with comprehensive exclusion rules
+- Updated `cmd_list`, `cmd_validate`, and `cmd_review` to use centralized file discovery
+- Improved path normalization and handling across different operating systems
+
+### 🎯 **Impact**
+
+This release resolves a major user experience issue where Dungeon Master would incorrectly identify files from installed packages (including its own source code in virtual environments) as files that needed documentation. Users can now safely use `dm list --all`, `dm validate`, and other commands without seeing false positives from their virtual environments.
+
+---
+
 ## [0.3.0] - 2025-01-01 🏰
 
 ### 📜 **Documentation & UX Revolution**
