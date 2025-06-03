@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# @track_context("verification_tests.md")
 """
 Verification script for Dungeon Master installation.
 Tests core functionality without requiring external dependencies.
@@ -33,16 +34,16 @@ def test_parser():
     print("Testing parser...")
     try:
         from dungeon_master.parser import extract_track_context_decorator, validate_context_document_name
-        
+
         # Test decorator extraction
         content = "# @track_context('test.md')\nclass MyClass:\n    pass"
         result = extract_track_context_decorator(content)
         assert result == "test.md", f"Expected 'test.md', got '{result}'"
-        
+
         # Test validation
         assert validate_context_document_name("test.md") == True
         assert validate_context_document_name("invalid") == False
-        
+
         print("✓ Parser tests passed")
         return True
     except Exception as e:
@@ -54,7 +55,7 @@ def test_template_generator():
     print("Testing template generator...")
     try:
         from dungeon_master.generator import generate_context_template, has_unfilled_placeholders
-        
+
         # Create a test file
         test_file = "test_file.py"
         test_content = """# @track_context('test.md')
@@ -64,7 +65,7 @@ import sys
 class TestClass:
     def method1(self, arg1, arg2):
         pass
-    
+
     def method2(self):
         return True
 
@@ -73,19 +74,19 @@ def function1():
 """
         with open(test_file, 'w') as f:
             f.write(test_content)
-        
+
         # Test template generation
         template = generate_context_template(test_file)
         assert template, "Template should not be empty"
         assert "Instructions for Cursor" in template, "Template should contain Cursor instructions"
-        assert "(Describe the overall intent" in template, "Template should contain placeholders"
-        
+        assert "<Describe the overall intent" in template, "Template should contain placeholders"
+
         # Test placeholder detection
         assert has_unfilled_placeholders(template) == True, "Should detect unfilled placeholders"
-        
+
         # Clean up
         os.remove(test_file)
-        
+
         print("✓ Template generator tests passed")
         return True
     except Exception as e:
@@ -101,7 +102,7 @@ def test_validation():
     try:
         from dungeon_master.updater import validate_context_document
         from dungeon_master.utils import write_file_content
-        
+
         # Create a test template with placeholders
         template_content = """# test.py - Context Documentation
 
@@ -109,27 +110,27 @@ def test_validation():
 
 ## Purpose
 
-(Describe the overall intent and responsibility of this file)
+<Describe the overall intent and responsibility of this file>
 
 ## Usage Summary
 
 **File Location**: `test.py`
 
 **Key Dependencies**:
-(List any important dependencies)
+<List any important dependencies>
 
 ---
 *This document is maintained by Cursor. Last updated: 2025-06-02*
 """
-        
+
         test_doc = "test_context.md"
         write_file_content(test_doc, template_content)
-        
+
         # Test validation - should fail with unfilled template
         is_valid, issues = validate_context_document(test_doc)
         assert is_valid == False, "Template with placeholders should not be valid"
         assert len(issues) > 0, "Should report issues"
-        
+
         # Create a completed document
         completed_content = """# test.py - Context Documentation
 
@@ -147,17 +148,17 @@ This file provides test functionality for the application.
 ---
 *This document is maintained by Cursor. Last updated: 2025-06-02*
 """
-        
+
         write_file_content(test_doc, completed_content)
-        
+
         # Test validation - should pass
         is_valid, issues = validate_context_document(test_doc)
         assert is_valid == True, "Completed document should be valid"
         assert len(issues) == 0, "Should have no issues"
-        
+
         # Clean up
         os.remove(test_doc)
-        
+
         print("✓ Validation tests passed")
         return True
     except Exception as e:
@@ -172,10 +173,10 @@ def test_cli_functionality():
     print("Testing CLI...")
     try:
         from dungeon_master.cli import main
-        
+
         # Test that CLI can be imported and main function exists
         assert callable(main)
-        
+
         print("✓ CLI tests passed")
         return True
     except Exception as e:
@@ -187,11 +188,11 @@ def test_directory_creation():
     print("Testing directory creation...")
     try:
         from dungeon_master.utils import ensure_output_directory
-        
+
         output_dir = ensure_output_directory()
         assert output_dir.exists()
-        assert output_dir.name == "dungeon_master"
-        
+        assert output_dir.name == "lore"
+
         print("✓ Directory creation tests passed")
         return True
     except Exception as e:
@@ -203,7 +204,7 @@ def main():
     print("=" * 50)
     print("Dungeon Master Installation Verification")
     print("=" * 50)
-    
+
     tests = [
         test_imports,
         test_parser,
@@ -212,18 +213,18 @@ def main():
         test_cli_functionality,
         test_directory_creation
     ]
-    
+
     passed = 0
     total = len(tests)
-    
+
     for test in tests:
         if test():
             passed += 1
         print()
-    
+
     print("=" * 50)
     print(f"Results: {passed}/{total} tests passed")
-    
+
     if passed == total:
         print("🎉 All verification tests passed!")
         print("Dungeon Master is ready for Cursor integration!")
@@ -235,4 +236,4 @@ def main():
         return 1
 
 if __name__ == "__main__":
-    sys.exit(main()) 
+    sys.exit(main())

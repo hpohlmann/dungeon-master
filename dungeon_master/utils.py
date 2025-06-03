@@ -1,3 +1,4 @@
+# @track_context("utilities.md")
 """
 Shared utility functions for Dungeon Master.
 """
@@ -13,12 +14,12 @@ logger = logging.getLogger(__name__)
 
 def ensure_output_directory() -> Path:
     """
-    Ensure the /dungeon_master/ output directory exists.
-    
+    Ensure the /lore/ output directory exists.
+
     Returns:
-        Path: The path to the output directory
+        Path: The path to the lore directory
     """
-    output_dir = Path("dungeon_master")
+    output_dir = Path("lore")
     output_dir.mkdir(exist_ok=True)
     return output_dir
 
@@ -26,7 +27,7 @@ def ensure_output_directory() -> Path:
 def get_git_changes() -> Tuple[List[str], List[str]]:
     """
     Get staged files and new files from Git.
-    
+
     Returns:
         Tuple[List[str], List[str]]: (staged_files, new_files)
     """
@@ -39,7 +40,7 @@ def get_git_changes() -> Tuple[List[str], List[str]]:
             check=True
         )
         staged_files = [f.strip() for f in result.stdout.split('\n') if f.strip()]
-        
+
         # Get new (untracked) files that are staged
         result = subprocess.run(
             ["git", "ls-files", "--others", "--cached", "--exclude-standard"],
@@ -48,9 +49,9 @@ def get_git_changes() -> Tuple[List[str], List[str]]:
             check=True
         )
         new_files = [f.strip() for f in result.stdout.split('\n') if f.strip()]
-        
+
         return staged_files, new_files
-        
+
     except subprocess.CalledProcessError as e:
         logger.error(f"Git command failed: {e}")
         return [], []
@@ -59,10 +60,10 @@ def get_git_changes() -> Tuple[List[str], List[str]]:
 def read_file_content(file_path: str) -> Optional[str]:
     """
     Read content from a file safely.
-    
+
     Args:
         file_path: Path to the file to read
-        
+
     Returns:
         Optional[str]: File content or None if file doesn't exist/can't be read
     """
@@ -77,18 +78,18 @@ def read_file_content(file_path: str) -> Optional[str]:
 def write_file_content(file_path: str, content: str) -> bool:
     """
     Write content to a file safely.
-    
+
     Args:
         file_path: Path to the file to write
         content: Content to write
-        
+
     Returns:
         bool: True if successful, False otherwise
     """
     try:
         # Ensure directory exists
         Path(file_path).parent.mkdir(parents=True, exist_ok=True)
-        
+
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)
         return True
@@ -100,10 +101,10 @@ def write_file_content(file_path: str, content: str) -> bool:
 def get_file_extension(file_path: str) -> str:
     """
     Get the file extension from a file path.
-    
+
     Args:
         file_path: Path to the file
-        
+
     Returns:
         str: File extension (e.g., '.py', '.js')
     """
@@ -113,10 +114,10 @@ def get_file_extension(file_path: str) -> str:
 def is_text_file(file_path: str) -> bool:
     """
     Check if a file is likely a text file based on extension.
-    
+
     Args:
         file_path: Path to the file
-        
+
     Returns:
         bool: True if likely a text file
     """
@@ -126,7 +127,7 @@ def is_text_file(file_path: str) -> bool:
         '.md', '.txt', '.json', '.yaml', '.yml', '.xml', '.html',
         '.css', '.scss', '.sass', '.sql', '.sh', '.bash', '.zsh'
     }
-    
+
     extension = get_file_extension(file_path).lower()
     return extension in text_extensions
 
@@ -134,9 +135,9 @@ def is_text_file(file_path: str) -> bool:
 def format_timestamp() -> str:
     """
     Format current timestamp for changelog entries.
-    
+
     Returns:
         str: Formatted timestamp (YYYY-MM-DD)
     """
     from datetime import datetime
-    return datetime.now().strftime("%Y-%m-%d") 
+    return datetime.now().strftime("%Y-%m-%d")

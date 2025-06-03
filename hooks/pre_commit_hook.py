@@ -1,36 +1,20 @@
 #!/usr/bin/env python3
+# @track_context("pre_commit_hook.md")
 """
 Pre-commit hook for Dungeon Master context tracking.
 
-This script integrates with Cursor to enforce context documentation:
-- Blocks commits when tracked files lack proper context documentation
-- Generates templates for Cursor to fill
-- Validates that templates have been meaningfully completed
+This script runs the core Dungeon Master workflow to enforce context documentation:
+1. dm update - Create templates and update documentation
+2. dm review - Check for significant changes needing review
+3. dm validate - Validate that all documentation is complete
+
+If any command fails, the commit is blocked with clear guidance.
 """
 
 import sys
+import subprocess
 import logging
 from pathlib import Path
-from typing import List, Tuple, Dict
-
-# Add the parent directory to the path so we can import dungeon_master
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from dungeon_master import (
-    parse_tracked_files,
-    ensure_output_directory,
-    get_git_changes
-)
-from dungeon_master.generator import generate_context_template
-from dungeon_master.updater import (
-    validate_context_document,
-    get_validation_status,
-    get_blocking_issues,
-    add_changelog_entry,
-    check_for_significant_changes
-)
-from dungeon_master.utils import write_file_content
-from dungeon_master.change_detector import ChangeDetector
 
 # Setup logging
 logging.basicConfig(
@@ -40,211 +24,87 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def process_new_tracked_files(tracked_files: Dict[str, str], output_dir: Path) -> Tuple[List[str], List[str]]:
+def run_dm_command(command_args: list[str]) -> tuple[int, str, str]:
     """
-    Process newly tracked files by creating templates.
-    
+    Run a Dungeon Master CLI command and return the result.
+
     Args:
-        tracked_files: Dictionary mapping file_path -> context_document_name
-        output_dir: Output directory for context documents
-        
+        command_args: List of command arguments (e.g., ['dm', 'update'])
+
     Returns:
-        Tuple[List[str], List[str]]: (created_templates, failed_creations)
+        Tuple of (exit_code, stdout, stderr)
     """
-    created_templates = []
-    failed_creations = []
-    
-    for file_path, context_doc_name in tracked_files.items():
-        context_doc_path = output_dir / context_doc_name
-        
-        if not context_doc_path.exists():
-            # Create new template
-            logger.info(f"Creating context template: {context_doc_path}")
-            template_content = generate_context_template(file_path)
-            
-            if template_content:
-                success = write_file_content(str(context_doc_path), template_content)
-                if success:
-                    created_templates.append(context_doc_name)
-                else:
-                    failed_creations.append(context_doc_name)
-            else:
-                failed_creations.append(context_doc_name)
-    
-    return created_templates, failed_creations
+    try:
+        result = subprocess.run(
+            command_args,
+            capture_output=True,
+            text=True,
+            timeout=30  # Prevent hanging
+        )
+        return result.returncode, result.stdout, result.stderr
+    except subprocess.TimeoutExpired:
+        return 1, "", "Command timed out after 30 seconds"
+    except Exception as e:
+        return 1, "", f"Failed to run command: {e}"
 
 
-def update_existing_documents(tracked_files: Dict[str, str], output_dir: Path) -> List[str]:
-    """
-    Update existing context documents with changelog entries for file changes.
-    
-    Args:
-        tracked_files: Dictionary mapping file_path -> context_document_name
-        output_dir: Output directory for context documents
-        
-    Returns:
-        List[str]: List of documents that were updated
-    """
-    updated_documents = []
-    
-    for file_path, context_doc_name in tracked_files.items():
-        context_doc_path = output_dir / context_doc_name
-        
-        if context_doc_path.exists():
-            # Check if document is valid before updating
-            is_valid, _ = validate_context_document(str(context_doc_path))
-            
-            if is_valid:
-                # Add changelog entry for the file modification
-                success = add_changelog_entry(str(context_doc_path), file_path)
-                if success:
-                    updated_documents.append(context_doc_name)
-                    logger.info(f"Added changelog entry to: {context_doc_name}")
-    
-    return updated_documents
-
-
-def print_commit_blocked_message(validation_status: Dict[str, Dict[str, any]], 
-                                created_templates: List[str],
-                                blocking_issues: List[str],
-                                significant_changes: List = None):
-    """
-    Print a comprehensive message explaining why the commit was blocked.
-    
-    Args:
-        validation_status: Validation status for all tracked files
-        created_templates: List of newly created templates
-        blocking_issues: List of issues blocking the commit
-        significant_changes: List of significant changes detected
-    """
-    print("\n" + "=" * 70)
-    print("🛡️  COMMIT BLOCKED: Context Documentation Required")
-    print("=" * 70)
-    
-    if created_templates:
-        print("\n📝 New context templates created:")
-        for template in created_templates:
-            print(f"   • dungeon_master/{template}")
-    
-    if significant_changes:
-        print("\n🔄 Significant changes detected requiring documentation review:")
-        for change in significant_changes:
-            print(f"\n   📄 {change.file_path}")
-            for change_desc in change.changes:
-                print(f"      • {change_desc}")
-    
-    if blocking_issues:
-        print("\n❌ Issues requiring attention:")
-        for issue in blocking_issues:
-            print(f"   • {issue}")
-    
-    print("\n🎯 Next Steps:")
-    if created_templates:
-        print("   1. Use Cursor to complete the new context templates")
-    if significant_changes:
-        print("   1. Review and update context documentation for changed files")
-        print("   2. Run 'dm review --mark-reviewed' when documentation is updated")
-    print("   3. Commit again once all issues are resolved")
-    
-    print("\n💡 This ensures your documentation stays current with code changes!")
-    print("=" * 70)
-
-
-def print_success_message(tracked_files: Dict[str, str], updated_documents: List[str]):
-    """
-    Print a success message when all validations pass.
-    
-    Args:
-        tracked_files: Dictionary of tracked files
-        updated_documents: List of documents that were updated
-    """
-    print("\n✅ Dungeon Master Context Tracking: All validations passed")
-    
-    if tracked_files:
-        print(f"   📊 Processed {len(tracked_files)} tracked file(s)")
-        
-        if updated_documents:
-            print(f"   📝 Updated {len(updated_documents)} context document(s)")
-            for doc in updated_documents:
-                print(f"      • {doc}")
-    
-    print("   🎯 Repository context documentation is up to date!")
+def print_command_output(command: str, stdout: str, stderr: str):
+    """Print the output from a command for user visibility."""
+    if stdout.strip():
+        print(stdout.strip())
+    if stderr.strip():
+        print(stderr.strip())
 
 
 def main() -> int:
     """
     Main entry point for the pre-commit hook.
-    
+
+    Runs the core Dungeon Master workflow:
+    1. dm update - Create/update templates and documentation
+    2. dm review - Check for significant changes
+    3. dm validate - Validate documentation completeness
+
     Returns:
         int: Exit code (0 for success, non-zero to block commit)
     """
-    logger.info("Dungeon Master pre-commit hook started")
-    
-    try:
-        # Get staged files from Git
-        staged_files, new_files = get_git_changes()
-        all_changed_files = list(set(staged_files + new_files))
-        
-        if not all_changed_files:
-            logger.info("No staged files found")
-            return 0
-        
-        logger.info(f"Found {len(all_changed_files)} changed files")
-        
-        # Parse tracked files
-        tracked_files = parse_tracked_files(all_changed_files)
-        
-        if not tracked_files:
-            logger.info("No tracked files found in staged changes")
-            return 0
-        
-        logger.info(f"Found {len(tracked_files)} tracked files:")
-        for file_path, context_doc in tracked_files.items():
-            logger.info(f"  {file_path} -> {context_doc}")
-        
-        # Ensure output directory exists
-        output_dir = ensure_output_directory()
-        
-        # Check for significant changes
-        significant_changes, changes_block = check_for_significant_changes(tracked_files)
-        
-        # Process new tracked files (create templates)
-        created_templates, failed_creations = process_new_tracked_files(tracked_files, output_dir)
-        
-        if failed_creations:
-            print(f"\n❌ Failed to create templates for: {', '.join(failed_creations)}")
-            return 1
-        
-        # Get validation status for all tracked files
-        validation_status = get_validation_status(tracked_files, output_dir)
-        
-        # Check for blocking issues (including significant changes)
-        blocking_issues = get_blocking_issues(validation_status, significant_changes)
-        
-        if blocking_issues or created_templates or changes_block:
-            # Block the commit and provide guidance
-            print_commit_blocked_message(validation_status, created_templates, blocking_issues, significant_changes)
-            return 1
-        
-        # If we get here, all validations passed
-        # Update existing documents with changelog entries
-        updated_documents = update_existing_documents(tracked_files, output_dir)
-        
-        # Save current state for change detection
-        detector = ChangeDetector()
-        detector.save_current_state(list(tracked_files.keys()))
-        
-        # Print success message
-        print_success_message(tracked_files, updated_documents)
-        
-        return 0
-        
-    except Exception as e:
-        logger.error(f"Unexpected error in pre-commit hook: {e}")
-        print(f"\n❌ Dungeon Master hook failed: {e}")
-        print("Please check the hook configuration and try again.")
-        return 1
+    print("🏰 Dungeon Master: Enforcing context documentation...")
+
+    # Step 1: Update documentation (create templates, update changelogs)
+    print("\n📝 Step 1: Updating documentation...")
+    exit_code, stdout, stderr = run_dm_command(['dm', 'update'])
+    print_command_output('dm update', stdout, stderr)
+
+    if exit_code != 0:
+        print(f"\n❌ 'dm update' failed with exit code {exit_code}")
+        print("Fix the issues above and try committing again.")
+        return exit_code
+
+    # Step 2: Review significant changes
+    print("\n🔄 Step 2: Checking for significant changes...")
+    exit_code, stdout, stderr = run_dm_command(['dm', 'review'])
+    print_command_output('dm review', stdout, stderr)
+
+    if exit_code != 0:
+        print(f"\n❌ 'dm review' detected significant changes requiring attention")
+        print("Review and update documentation, then run 'dm review --mark-reviewed'")
+        print("\n💡 Note: If changes are minor (formatting, comments, small fixes),")
+        print("   you can run 'dm review --mark-reviewed' to proceed without updating docs.")
+        return exit_code
+
+    # Step 3: Validate all documentation
+    print("\n✅ Step 3: Validating documentation...")
+    exit_code, stdout, stderr = run_dm_command(['dm', 'validate'])
+    print_command_output('dm validate', stdout, stderr)
+
+    if exit_code != 0:
+        print(f"\n❌ 'dm validate' found incomplete documentation")
+        print("Complete the templates and try committing again.")
+        return exit_code
+
+    print("\n🎯 All Dungeon Master checks passed! Commit proceeding...")
+    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main()) 
+    sys.exit(main())
