@@ -23,7 +23,9 @@ This file implements the primary command-line interface for Dungeon Master, prov
 
 **File Discovery & Processing**:
 
-- Efficient file walking with proper exclusion of hidden and build directories
+- **Smart Directory Exclusion**: Comprehensive logic to exclude virtual environments (`venv`, `.venv`, `env`, etc.), build directories (`node_modules`, `__pycache__`, `dist`), and IDE directories (`.vscode`, `.idea`)
+- **Virtual Environment Protection**: Prevents false positives from installed packages containing `@track_context` decorators
+- **Efficient File Walking**: Uses in-place directory filtering to avoid walking into excluded directories for better performance
 - Consolidated import handling for clean code organization
 - Supports both staged-file processing and repository-wide analysis
 - Handles multiple file processing with clear per-file status reporting
@@ -66,14 +68,33 @@ dm review --mark-reviewed  # Mark changes as reviewed
 - Provides detailed exit codes for CI/CD integration
 - Maintains clear separation between user commands and internal logic
 
+## Key Internal Functions
+
+**Directory Exclusion Logic**:
+
+- **`_should_exclude_directory(dir_name)`**: Determines if a directory should be excluded from file walking. Checks against comprehensive lists of virtual environments, build directories, IDE directories, and hidden directories.
+- **`_get_all_project_files()`**: Centralized file discovery function that walks the project directory while excluding problematic directories. Uses in-place directory filtering for efficiency and returns normalized file paths.
+
+**Core Command Functions**:
+
+- **`cmd_update()`**: Handles template creation and validation workflow
+- **`cmd_list()`**: Displays tracked files with status information
+- **`cmd_validate()`**: Comprehensive validation and commit-blocking logic
+- **`cmd_review()`**: Manages significant change approval workflow
+- **`cmd_init()`**: Repository initialization with proper setup
+
 ---
 
 ## Changelog
 
-### [2025-01-01]
+### [2025-06-03]
 
-- Consolidated multiple inline `import os` statements into single top-level import for better code organization
-- Removed redundant import statements from `cmd_list`, `cmd_validate`, and `cmd_review` functions
+- **MAJOR BUG FIX**: Fixed critical issue where virtual environment files were being flagged as tracked files
+- **Added comprehensive directory exclusion**: New `_should_exclude_directory()` function excludes virtual environments (`venv`, `.venv`, `env`, `virtualenv`, `pyenv`, `conda`, etc.), build directories, and IDE directories
+- **Added centralized file discovery**: New `_get_all_project_files()` function provides consistent, efficient file walking with proper exclusions
+- **Updated all affected commands**: `cmd_list`, `cmd_validate`, and `cmd_review` now use centralized exclusion logic
+- **Performance improvement**: Uses in-place directory filtering to avoid walking into excluded directories
+- **Enhanced user experience**: Users no longer see false positives from installed packages in their virtual environments
 
 ### [2025-06-02]
 
