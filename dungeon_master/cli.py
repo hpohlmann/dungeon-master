@@ -21,6 +21,71 @@ from .utils import write_file_content
 from .change_detector import ChangeDetector
 
 
+def _should_exclude_directory(dir_name: str) -> bool:
+    """
+    Check if a directory should be excluded from file walking.
+
+    Args:
+        dir_name: Directory name to check
+
+    Returns:
+        bool: True if directory should be excluded
+    """
+    # Hidden directories
+    if dir_name.startswith('.'):
+        return True
+
+    # Common build and dependency directories
+    build_dirs = {
+        'node_modules', '__pycache__', 'build', 'dist', 'target',
+        '.git', '.svn', '.hg', '.bzr',
+        'bower_components', '.npm', '.yarn'
+    }
+
+    # Virtual environment directories (comprehensive list)
+    venv_dirs = {
+        'venv', 'env', 'virtualenv', 'pyenv', 'conda',
+        '.venv', '.env', '.virtualenv', '.pyenv', '.conda',
+        'ENV', 'env_name', 'venv_name'
+    }
+
+    # IDE and editor directories
+    ide_dirs = {
+        '.vscode', '.idea', '.eclipse', '.settings',
+        '__pycache__', '.pytest_cache', '.mypy_cache',
+        '.coverage', '.tox', '.nox'
+    }
+
+    excluded_dirs = build_dirs | venv_dirs | ide_dirs
+
+    return dir_name in excluded_dirs
+
+
+def _get_all_project_files() -> List[str]:
+    """
+    Get all files in the current project, excluding virtual environments and build directories.
+
+    Returns:
+        List[str]: List of file paths relative to current directory
+    """
+    all_files = []
+    for root, dirs, files in os.walk('.'):
+        # Filter out excluded directories IN-PLACE to prevent walking into them
+        dirs[:] = [d for d in dirs if not _should_exclude_directory(d)]
+
+        for file in files:
+            # Skip hidden files
+            if file.startswith('.'):
+                continue
+
+            file_path = os.path.join(root, file)
+            # Normalize path and remove leading './'
+            normalized_path = file_path.replace('./', '').replace('.\\', '')
+            all_files.append(normalized_path)
+
+    return all_files
+
+
 def cmd_update(args) -> int:
     """
     Create templates or validate context documents for tracked files.
@@ -94,16 +159,8 @@ def cmd_list(args) -> int:
         int: Exit code
     """
     if args.all:
-        # Find all tracked files in the repository
-        all_files = []
-        for root, dirs, files in os.walk('.'):
-            # Skip hidden directories and common build directories
-            dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['node_modules', '__pycache__', 'build', 'dist']]
-            for file in files:
-                file_path = os.path.join(root, file)
-                if not file.startswith('.'):
-                    all_files.append(file_path.replace('./', ''))
-
+        # Find all tracked files in the repository (excluding venv and build dirs)
+        all_files = _get_all_project_files()
         tracked_files = parse_tracked_files(all_files)
     else:
         # Only staged files
@@ -154,15 +211,8 @@ def cmd_validate(args) -> int:
     if args.files:
         tracked_files = parse_tracked_files(args.files)
     else:
-        # Find all tracked files
-        all_files = []
-        for root, dirs, files in os.walk('.'):
-            dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['node_modules', '__pycache__', 'build', 'dist']]
-            for file in files:
-                file_path = os.path.join(root, file)
-                if not file.startswith('.'):
-                    all_files.append(file_path.replace('./', ''))
-
+        # Find all tracked files (excluding venv and build dirs)
+        all_files = _get_all_project_files()
         tracked_files = parse_tracked_files(all_files)
 
     if not tracked_files:
@@ -275,15 +325,8 @@ def cmd_review(args) -> int:
         tracked_files = parse_tracked_files(args.files)
         file_paths = args.files
     else:
-        # Find all tracked files
-        all_files = []
-        for root, dirs, files in os.walk('.'):
-            dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['node_modules', '__pycache__', 'build', 'dist']]
-            for file in files:
-                file_path = os.path.join(root, file)
-                if not file.startswith('.'):
-                    all_files.append(file_path.replace('./', ''))
-
+        # Find all tracked files (excluding venv and build dirs)
+        all_files = _get_all_project_files()
         tracked_files = parse_tracked_files(all_files)
         file_paths = list(tracked_files.keys())
 
