@@ -1,8 +1,10 @@
+# @track_context("cli.md")
 """
 Command-line interface for Dungeon Master.
 """
 
 import argparse
+import os
 import sys
 from pathlib import Path
 from typing import List, Dict
@@ -22,10 +24,10 @@ from .change_detector import ChangeDetector
 def cmd_update(args) -> int:
     """
     Create templates or validate context documents for tracked files.
-    
+
     Args:
         args: Command arguments
-        
+
     Returns:
         int: Exit code
     """
@@ -37,18 +39,18 @@ def cmd_update(args) -> int:
         staged_files, new_files = get_git_changes()
         all_files = list(set(staged_files + new_files))
         tracked_files = parse_tracked_files(all_files)
-    
+
     if not tracked_files:
         print("No tracked files found.")
         return 0
-    
+
     output_dir = ensure_output_directory()
     exit_code = 0
-    
+
     for file_path, context_doc_name in tracked_files.items():
         context_doc_path = output_dir / context_doc_name
         print(f"Processing: {file_path} -> {context_doc_name}")
-        
+
         try:
             if not context_doc_path.exists():
                 # Create new template
@@ -77,23 +79,22 @@ def cmd_update(args) -> int:
         except Exception as e:
             print(f"  ✗ Error: {e}")
             exit_code = 1
-    
+
     return exit_code
 
 
 def cmd_list(args) -> int:
     """
     List all tracked files and their context document status.
-    
+
     Args:
         args: Command arguments
-        
+
     Returns:
         int: Exit code
     """
     if args.all:
         # Find all tracked files in the repository
-        import os
         all_files = []
         for root, dirs, files in os.walk('.'):
             # Skip hidden directories and common build directories
@@ -102,30 +103,30 @@ def cmd_list(args) -> int:
                 file_path = os.path.join(root, file)
                 if not file.startswith('.'):
                     all_files.append(file_path.replace('./', ''))
-        
+
         tracked_files = parse_tracked_files(all_files)
     else:
         # Only staged files
         staged_files, new_files = get_git_changes()
         all_files = list(set(staged_files + new_files))
         tracked_files = parse_tracked_files(all_files)
-    
+
     if not tracked_files:
         print("No tracked files found.")
         return 0
-    
+
     output_dir = ensure_output_directory()
     validation_status = get_validation_status(tracked_files, output_dir)
-    
+
     print(f"Found {len(tracked_files)} tracked files:")
     print("=" * 70)
-    
+
     for file_path, status in validation_status.items():
         context_doc_name = status['context_doc']
-        
+
         print(f"📄 {file_path}")
         print(f"   📋 {context_doc_name}", end="")
-        
+
         if not status['exists']:
             print(" (MISSING - template needed)")
         elif not status['valid']:
@@ -134,19 +135,19 @@ def cmd_list(args) -> int:
                 print(f"      • {issue}")
         else:
             print(" (✓ COMPLETE)")
-        
+
         print()
-    
+
     return 0
 
 
 def cmd_validate(args) -> int:
     """
     Validate context documents and show what would block a commit.
-    
+
     Args:
         args: Command arguments
-        
+
     Returns:
         int: Exit code (0 if all valid, 1 if issues found)
     """
@@ -154,7 +155,6 @@ def cmd_validate(args) -> int:
         tracked_files = parse_tracked_files(args.files)
     else:
         # Find all tracked files
-        import os
         all_files = []
         for root, dirs, files in os.walk('.'):
             dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['node_modules', '__pycache__', 'build', 'dist']]
@@ -162,33 +162,33 @@ def cmd_validate(args) -> int:
                 file_path = os.path.join(root, file)
                 if not file.startswith('.'):
                     all_files.append(file_path.replace('./', ''))
-        
+
         tracked_files = parse_tracked_files(all_files)
-    
+
     if not tracked_files:
         print("No tracked files found.")
         return 0
-    
+
     output_dir = ensure_output_directory()
     validation_status = get_validation_status(tracked_files, output_dir)
-    
+
     # Check for significant changes
     from .updater import check_for_significant_changes
     significant_changes, changes_block = check_for_significant_changes(tracked_files)
-    
+
     # Get blocking issues (including significant changes)
     blocking_issues = get_blocking_issues(validation_status, significant_changes)
-    
+
     print("🔍 Context Documentation Validation")
     print("=" * 50)
-    
+
     if significant_changes:
         print("\n🔄 Significant changes detected:")
         for change in significant_changes:
             print(f"\n   📄 {change.file_path}")
             for change_desc in change.changes:
                 print(f"      • {change_desc}")
-    
+
     if not blocking_issues:
         if significant_changes:
             print("\n⚠️  Significant changes detected but would not block commits.")
@@ -201,33 +201,33 @@ def cmd_validate(args) -> int:
         print("\n❌ Issues found that would block commits:")
         for issue in blocking_issues:
             print(f"   • {issue}")
-        
+
         print("\n📝 Use Cursor to complete the documentation:")
         for file_path, status in validation_status.items():
             if not status['valid']:
-                print(f"   • dungeon_master/{status['context_doc']}")
-        
+                print(f"   • lore/{status['context_doc']}")
+
         if significant_changes:
             print("\n🔄 To resolve significant changes:")
             print("   • dm review --mark-reviewed")
-        
+
         return 1
 
 
 def cmd_init(args) -> int:
     """
     Initialize Dungeon Master in the current repository.
-    
+
     Args:
         args: Command arguments
-        
+
     Returns:
         int: Exit code
     """
     # Create output directory
     output_dir = ensure_output_directory()
     print(f"✓ Created output directory: {output_dir}")
-    
+
     # Create a sample pre-commit config if it doesn't exist
     precommit_config = Path('.pre-commit-config.yaml')
     if not precommit_config.exists():
@@ -246,7 +246,7 @@ def cmd_init(args) -> int:
         print(f"✓ Created pre-commit config: {precommit_config}")
     else:
         print(f"ℹ Pre-commit config already exists: {precommit_config}")
-    
+
     print("\n🎯 Dungeon Master initialization complete!")
     print("\nThis system creates a structured integration point where Cursor")
     print("collaborates with you to maintain repository documentation.")
@@ -257,17 +257,17 @@ def cmd_init(args) -> int:
     print("   • Commits are blocked until templates are completed")
     print("   • Use Cursor to fill in the documentation")
     print("   • Commits proceed once documentation is complete")
-    
+
     return 0
 
 
 def cmd_review(args) -> int:
     """
     Mark significant changes as reviewed, allowing commits to proceed.
-    
+
     Args:
         args: Command arguments
-        
+
     Returns:
         int: Exit code
     """
@@ -276,7 +276,6 @@ def cmd_review(args) -> int:
         file_paths = args.files
     else:
         # Find all tracked files
-        import os
         all_files = []
         for root, dirs, files in os.walk('.'):
             dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['node_modules', '__pycache__', 'build', 'dist']]
@@ -284,30 +283,30 @@ def cmd_review(args) -> int:
                 file_path = os.path.join(root, file)
                 if not file.startswith('.'):
                     all_files.append(file_path.replace('./', ''))
-        
+
         tracked_files = parse_tracked_files(all_files)
         file_paths = list(tracked_files.keys())
-    
+
     if not tracked_files:
         print("No tracked files found.")
         return 0
-    
+
     # Check for significant changes
     detector = ChangeDetector()
     significant_changes = detector.get_significant_changes(file_paths)
-    
+
     if not significant_changes:
         print("✅ No significant changes detected that require review.")
         return 0
-    
+
     print("🔍 Significant changes detected:")
     print("=" * 50)
-    
+
     for change in significant_changes:
         print(f"\n📄 {change.file_path}")
         for change_desc in change.changes:
             print(f"   • {change_desc}")
-    
+
     if args.mark_reviewed:
         # Mark as reviewed without prompting
         detector.mark_as_reviewed(file_paths)
@@ -317,7 +316,18 @@ def cmd_review(args) -> int:
     else:
         print(f"\n📝 To allow commits to proceed, mark these changes as reviewed:")
         print(f"   dm review --mark-reviewed")
-        print(f"\n💡 Make sure you've updated the context documentation to reflect these changes!")
+        print(f"\n💡 Update documentation if changes affect core functionality, OR")
+        print(f"   mark as reviewed if changes are minor/cosmetic:")
+        print(f"")
+        print(f"   🔍 REVIEW REQUIRED if changes affect:")
+        print(f"      • Core logic or system behavior")
+        print(f"      • API interfaces or function signatures")
+        print(f"      • Critical functionality or user workflows")
+        print(f"")
+        print(f"   ✅ SAFE TO MARK REVIEWED if changes are:")
+        print(f"      • Formatting, comments, or documentation")
+        print(f"      • Minor bug fixes without behavior changes")
+        print(f"      • Refactoring that doesn't change functionality")
         return 1
 
 
@@ -338,40 +348,40 @@ Examples:
   dm review --mark-reviewed  # Mark changes as reviewed
 """
     )
-    
+
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
-    
+
     # Update command
     update_parser = subparsers.add_parser('update', help='Create templates or validate context documents')
     update_parser.add_argument('files', nargs='*', help='Specific files to process')
     update_parser.set_defaults(func=cmd_update)
-    
+
     # List command
     list_parser = subparsers.add_parser('list', help='List tracked files and their status')
     list_parser.add_argument('--all', action='store_true', help='List all tracked files, not just staged')
     list_parser.set_defaults(func=cmd_list)
-    
+
     # Validate command
     validate_parser = subparsers.add_parser('validate', help='Validate context documents')
     validate_parser.add_argument('files', nargs='*', help='Specific files to validate')
     validate_parser.set_defaults(func=cmd_validate)
-    
+
     # Init command
     init_parser = subparsers.add_parser('init', help='Initialize Dungeon Master')
     init_parser.set_defaults(func=cmd_init)
-    
+
     # Review command
     review_parser = subparsers.add_parser('review', help='Review significant changes in tracked files')
     review_parser.add_argument('files', nargs='*', help='Specific files to review')
     review_parser.add_argument('--mark-reviewed', action='store_true', help='Mark changes as reviewed')
     review_parser.set_defaults(func=cmd_review)
-    
+
     args = parser.parse_args()
-    
+
     if not args.command:
         parser.print_help()
         return 1
-    
+
     try:
         return args.func(args)
     except Exception as e:
@@ -380,4 +390,4 @@ Examples:
 
 
 if __name__ == "__main__":
-    sys.exit(main()) 
+    sys.exit(main())

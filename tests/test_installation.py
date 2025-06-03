@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# @track_context("installation_tests.md")
 """
 Quick test script to verify Dungeon Master installation.
 Run this after installing the package to ensure everything works.
@@ -26,22 +27,22 @@ def test_cli():
     print("🔍 Testing CLI commands...")
     try:
         # Test help command
-        result = subprocess.run([sys.executable, "-m", "dungeon_master.cli", "--help"], 
+        result = subprocess.run([sys.executable, "-m", "dungeon_master.cli", "--help"],
                               capture_output=True, text=True)
         if result.returncode == 0:
             print("✅ CLI help command works")
         else:
             print(f"❌ CLI help failed: {result.stderr}")
             return False
-            
+
         # Test console script
-        result = subprocess.run(["dm", "--help"], 
+        result = subprocess.run(["dm", "--help"],
                               capture_output=True, text=True)
         if result.returncode == 0:
             print("✅ Console script 'dm' works")
         else:
             print(f"⚠️  Console script might not be in PATH: {result.stderr}")
-        
+
         return True
     except Exception as e:
         print(f"❌ CLI test failed: {e}")
@@ -50,23 +51,23 @@ def test_cli():
 def test_workflow():
     """Test basic workflow in a temporary directory."""
     print("🔍 Testing basic workflow...")
-    
+
     with tempfile.TemporaryDirectory() as tmp_dir:
         os.chdir(tmp_dir)
-        
+
         try:
             # Initialize git repo
             subprocess.run(["git", "init"], capture_output=True)
             subprocess.run(["git", "config", "user.email", "test@example.com"], capture_output=True)
             subprocess.run(["git", "config", "user.name", "Test User"], capture_output=True)
-            
+
             # Initialize dungeon master
-            result = subprocess.run([sys.executable, "-m", "dungeon_master.cli", "init"], 
+            result = subprocess.run([sys.executable, "-m", "dungeon_master.cli", "init"],
                                   capture_output=True, text=True)
             if result.returncode != 0:
                 print(f"❌ Init failed: {result.stderr}")
                 return False
-            
+
             # Create a test file with tracking
             test_file = Path("test_module.py")
             test_file.write_text('''# @track_context("test_module.md")
@@ -77,41 +78,41 @@ def hello_world():
 
 class TestClass:
     """A test class."""
-    
+
     def __init__(self):
         self.value = 42
-    
+
     def get_value(self):
         return self.value
 ''')
-            
+
             # Test update command
-            result = subprocess.run([sys.executable, "-m", "dungeon_master.cli", "update", str(test_file)], 
+            result = subprocess.run([sys.executable, "-m", "dungeon_master.cli", "update", str(test_file)],
                                   capture_output=True, text=True)
             if result.returncode != 0:
                 print(f"❌ Update failed: {result.stderr}")
                 return False
-            
+
             # Check if template was created
-            template_path = Path("dungeon_master/test_module.md")
+            template_path = Path("lore/test_module.md")
             if template_path.exists():
                 print("✅ Template creation works")
                 print(f"📄 Created: {template_path}")
             else:
                 print("❌ Template was not created")
                 return False
-            
+
             # Test validation
-            result = subprocess.run([sys.executable, "-m", "dungeon_master.cli", "validate"], 
+            result = subprocess.run([sys.executable, "-m", "dungeon_master.cli", "validate"],
                                   capture_output=True, text=True)
             # Should fail because template has placeholders
             if result.returncode != 0:
                 print("✅ Validation correctly detects incomplete templates")
             else:
                 print("⚠️  Validation might not be working correctly")
-            
+
             return True
-            
+
         except Exception as e:
             print(f"❌ Workflow test failed: {e}")
             return False
@@ -120,26 +121,26 @@ def main():
     """Run all installation tests."""
     print("🧪 Testing Dungeon Master Installation")
     print("=" * 50)
-    
+
     tests = [
         ("Package Import", test_import),
         ("CLI Commands", test_cli),
         ("Basic Workflow", test_workflow),
     ]
-    
+
     passed = 0
     total = len(tests)
-    
+
     for test_name, test_func in tests:
         print(f"\n📋 {test_name}")
         print("-" * 30)
         if test_func():
             passed += 1
         print()
-    
+
     print("=" * 50)
     print(f"📊 Results: {passed}/{total} tests passed")
-    
+
     if passed == total:
         print("🎉 Installation test successful!")
         print("🚀 Dungeon Master is ready to use!")
@@ -155,4 +156,4 @@ def main():
         return 1
 
 if __name__ == "__main__":
-    sys.exit(main()) 
+    sys.exit(main())

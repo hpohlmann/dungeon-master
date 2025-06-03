@@ -57,8 +57,7 @@ packages = ["dungeon_master"]
 [tool.setuptools.dynamic]
 version = {attr = "dungeon_master.__version__"}
 
-[tool.setuptools.package-data]
-dungeon_master = ["py.typed"]
+
 
 [tool.black]
 line-length = 88
@@ -75,4 +74,4 @@ disallow_untyped_defs = true
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
-python_functions = ["test_*"] 
+python_functions = ["test_*"]

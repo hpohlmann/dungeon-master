@@ -13,7 +13,7 @@ long_description = (this_directory / "README.md").read_text() if (this_directory
 # Version info - keeping it simple for now
 version = {
     "__version__": "0.2.0",
-    "__author__": "Dungeon Master Team", 
+    "__author__": "Dungeon Master Team",
     "__description__": "Context-tracking pre-commit tool for Cursor integration"
 }
 
@@ -60,12 +60,9 @@ setup(
         ],
     },
     include_package_data=True,
-    package_data={
-        "dungeon_master": ["py.typed"],
-    },
     keywords="documentation git pre-commit context tracking",
     project_urls={
         "Bug Reports": "https://github.com/yourusername/dungeon-master/issues",
         "Source": "https://github.com/yourusername/dungeon-master",
     },
-) 
+)

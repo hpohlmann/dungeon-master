@@ -2,7 +2,7 @@
 Dungeon Master: A context-tracking pre-commit tool.
 
 Maintains human-readable, file-linked context documents in Markdown format.
-This is a structured integration point where Cursor collaborates with users 
+This is a structured integration point where Cursor collaborates with users
 to maintain a self-updating knowledge base.
 """
 
@@ -17,10 +17,10 @@ from .utils import ensure_output_directory, get_git_changes
 
 __all__ = [
     "parse_tracked_files",
-    "generate_context_template", 
+    "generate_context_template",
     "has_unfilled_placeholders",
     "validate_context_document",
     "add_changelog_entry",
     "ensure_output_directory",
     "get_git_changes",
-] 
+]
