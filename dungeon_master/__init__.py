@@ -6,7 +6,7 @@ This is a structured integration point where Cursor collaborates with users
 to maintain a self-updating knowledge base.
 """
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 __author__ = "Dungeon Master Team"
 __description__ = "Context-tracking pre-commit tool for Cursor integration"
 
