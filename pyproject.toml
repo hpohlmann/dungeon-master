@@ -72,11 +72,10 @@ python_functions = ["test_*"]
 addopts = "--verbose --tb=short"
 
 [tool.coverage.run]
-source = ["dungeon_master"]
+source = ["./dungeon_master"]
 omit = [
     "*/tests/*",
     "*/examples/*",
-    "*/templates/*",
 ]
 
 [tool.coverage.report]

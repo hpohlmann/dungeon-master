@@ -2,20 +2,20 @@
 Unit tests for the Cursor rules setup functionality.
 """
 
-import pytest
 import tempfile
-import shutil
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
+import pytest
+
 from dungeon_master.utils.cursor_setup import (
-    get_templates_directory,
-    create_cursor_rules_directory,
+    CURSOR_RULE_FILES,
     copy_rule_file,
+    create_cursor_rules_directory,
+    get_templates_directory,
+    remove_cursor_rules,
     setup_cursor_rules,
     verify_cursor_rules_setup,
-    remove_cursor_rules,
-    CURSOR_RULE_FILES,
-    DEFAULT_CURSOR_RULES_DIR
 )
 
 
@@ -36,15 +36,11 @@ class TestTemplatesDirectory:
 
     def test_get_templates_directory_not_found(self):
         """Test error handling when templates directory doesn't exist."""
-        with patch('dungeon_master.utils.cursor_setup.Path') as mock_path:
-            # Mock the path structure to simulate missing templates
-            mock_file = MagicMock()
-            mock_file.parent.parent.parent = Path("/nonexistent")
-            mock_path.__file__ = "/fake/path"
-            mock_path.return_value = mock_file
-            
-            # The templates directory won't exist at the mocked path
-            with pytest.raises(FileNotFoundError, match="Templates directory not found"):
+        # We'll patch the exists method of the final templates directory path
+        with patch.object(Path, 'exists', return_value=False):
+            with pytest.raises(
+                FileNotFoundError, match="Templates directory not found"
+            ):
                 get_templates_directory()
 
 
@@ -56,9 +52,9 @@ class TestCursorRulesDirectory:
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             rules_dir = temp_path / ".cursor" / "rules"
-            
+
             result = create_cursor_rules_directory(str(rules_dir))
-            
+
             assert result == rules_dir
             assert rules_dir.exists()
             assert rules_dir.is_dir()
@@ -69,9 +65,9 @@ class TestCursorRulesDirectory:
             temp_path = Path(temp_dir)
             rules_dir = temp_path / ".cursor" / "rules"
             rules_dir.mkdir(parents=True)
-            
+
             result = create_cursor_rules_directory(str(rules_dir))
-            
+
             assert result == rules_dir
             assert rules_dir.exists()
 
@@ -89,21 +85,21 @@ class TestCopyRuleFile:
         """Test successful rule file copying."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            
+
             # Create source file
             source_dir = temp_path / "source"
             source_dir.mkdir()
             source_file = source_dir / "test.mdc"
             source_file.write_text("# Test Rule\n\nTest content")
-            
+
             # Create destination directory
             dest_dir = temp_path / "dest"
             dest_dir.mkdir()
-            
+
             # Copy file
-            with patch('dungeon_master.utils.cursor_setup.console'):
+            with patch("dungeon_master.utils.cursor_setup.console"):
                 result = copy_rule_file("test.mdc", source_dir, dest_dir)
-            
+
             assert result is True
             dest_file = dest_dir / "test.mdc"
             assert dest_file.exists()
@@ -113,37 +109,39 @@ class TestCopyRuleFile:
         """Test copying when source file doesn't exist."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            
+
             source_dir = temp_path / "source"
             source_dir.mkdir()
             dest_dir = temp_path / "dest"
             dest_dir.mkdir()
-            
-            with patch('dungeon_master.utils.cursor_setup.console'):
+
+            with patch("dungeon_master.utils.cursor_setup.console"):
                 result = copy_rule_file("nonexistent.mdc", source_dir, dest_dir)
-            
+
             assert result is False
 
     def test_copy_rule_file_no_overwrite(self):
         """Test copying when destination exists and overwrite is False."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            
+
             # Create source and destination files
             source_dir = temp_path / "source"
             source_dir.mkdir()
             source_file = source_dir / "test.mdc"
             source_file.write_text("Source content")
-            
+
             dest_dir = temp_path / "dest"
             dest_dir.mkdir()
             dest_file = dest_dir / "test.mdc"
             dest_file.write_text("Existing content")
-            
+
             # Try to copy without overwrite
-            with patch('dungeon_master.utils.cursor_setup.console'):
-                result = copy_rule_file("test.mdc", source_dir, dest_dir, overwrite=False)
-            
+            with patch("dungeon_master.utils.cursor_setup.console"):
+                result = copy_rule_file(
+                    "test.mdc", source_dir, dest_dir, overwrite=False
+                )
+
             assert result is False
             assert dest_file.read_text() == "Existing content"
 
@@ -151,22 +149,24 @@ class TestCopyRuleFile:
         """Test copying when destination exists and overwrite is True."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            
+
             # Create source and destination files
             source_dir = temp_path / "source"
             source_dir.mkdir()
             source_file = source_dir / "test.mdc"
             source_file.write_text("New content")
-            
+
             dest_dir = temp_path / "dest"
             dest_dir.mkdir()
             dest_file = dest_dir / "test.mdc"
             dest_file.write_text("Old content")
-            
+
             # Copy with overwrite
-            with patch('dungeon_master.utils.cursor_setup.console'):
-                result = copy_rule_file("test.mdc", source_dir, dest_dir, overwrite=True)
-            
+            with patch("dungeon_master.utils.cursor_setup.console"):
+                result = copy_rule_file(
+                    "test.mdc", source_dir, dest_dir, overwrite=True
+                )
+
             assert result is True
             assert dest_file.read_text() == "New content"
 
@@ -178,24 +178,29 @@ class TestSetupCursorRules:
         """Test successful cursor rules setup."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            
+
             # Create mock templates directory with rule files
             templates_dir = temp_path / "templates"
             templates_dir.mkdir()
             for rule_file in CURSOR_RULE_FILES:
                 (templates_dir / rule_file).write_text(f"# {rule_file}\n\nRule content")
-            
+
             # Set up destination
             rules_dir = temp_path / ".cursor" / "rules"
-            
+
             # Mock get_templates_directory to return our test directory
-            with patch('dungeon_master.utils.cursor_setup.get_templates_directory', return_value=templates_dir):
-                with patch('dungeon_master.utils.cursor_setup.console'):
-                    copied_files, failed_files = setup_cursor_rules(str(rules_dir), verbose=False)
-            
+            with patch(
+                "dungeon_master.utils.cursor_setup.get_templates_directory",
+                return_value=templates_dir,
+            ):
+                with patch("dungeon_master.utils.cursor_setup.console"):
+                    copied_files, failed_files = setup_cursor_rules(
+                        str(rules_dir), verbose=False
+                    )
+
             assert len(copied_files) == len(CURSOR_RULE_FILES)
             assert len(failed_files) == 0
-            
+
             # Verify all files were copied
             for rule_file in CURSOR_RULE_FILES:
                 dest_file = rules_dir / rule_file
@@ -206,10 +211,12 @@ class TestSetupCursorRules:
         """Test setup when templates directory doesn't exist."""
         with tempfile.TemporaryDirectory() as temp_dir:
             rules_dir = Path(temp_dir) / ".cursor" / "rules"
-            
-            with patch('dungeon_master.utils.cursor_setup.get_templates_directory', 
-                      side_effect=FileNotFoundError("Templates not found")):
-                with patch('dungeon_master.utils.cursor_setup.console'):
+
+            with patch(
+                "dungeon_master.utils.cursor_setup.get_templates_directory",
+                side_effect=FileNotFoundError("Templates not found"),
+            ):
+                with patch("dungeon_master.utils.cursor_setup.console"):
                     with pytest.raises(FileNotFoundError):
                         setup_cursor_rules(str(rules_dir), verbose=False)
 
@@ -217,21 +224,26 @@ class TestSetupCursorRules:
         """Test setup with some files missing."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            
+
             # Create templates directory with only some rule files
             templates_dir = temp_path / "templates"
             templates_dir.mkdir()
-            
+
             # Only create the first two rule files
             for rule_file in CURSOR_RULE_FILES[:2]:
                 (templates_dir / rule_file).write_text(f"# {rule_file}\n\nRule content")
-            
+
             rules_dir = temp_path / ".cursor" / "rules"
-            
-            with patch('dungeon_master.utils.cursor_setup.get_templates_directory', return_value=templates_dir):
-                with patch('dungeon_master.utils.cursor_setup.console'):
-                    copied_files, failed_files = setup_cursor_rules(str(rules_dir), verbose=False)
-            
+
+            with patch(
+                "dungeon_master.utils.cursor_setup.get_templates_directory",
+                return_value=templates_dir,
+            ):
+                with patch("dungeon_master.utils.cursor_setup.console"):
+                    copied_files, failed_files = setup_cursor_rules(
+                        str(rules_dir), verbose=False
+                    )
+
             assert len(copied_files) == 2
             assert len(failed_files) == 2
 
@@ -245,13 +257,13 @@ class TestVerifyCursorRulesSetup:
             temp_path = Path(temp_dir)
             rules_dir = temp_path / ".cursor" / "rules"
             rules_dir.mkdir(parents=True)
-            
+
             # Create all rule files
             for rule_file in CURSOR_RULE_FILES:
                 (rules_dir / rule_file).write_text("Rule content")
-            
+
             present_files, missing_files = verify_cursor_rules_setup(str(rules_dir))
-            
+
             assert len(present_files) == len(CURSOR_RULE_FILES)
             assert len(missing_files) == 0
             assert set(present_files) == set(CURSOR_RULE_FILES)
@@ -262,14 +274,14 @@ class TestVerifyCursorRulesSetup:
             temp_path = Path(temp_dir)
             rules_dir = temp_path / ".cursor" / "rules"
             rules_dir.mkdir(parents=True)
-            
+
             # Create only half the rule files
             present_rule_files = CURSOR_RULE_FILES[:2]
             for rule_file in present_rule_files:
                 (rules_dir / rule_file).write_text("Rule content")
-            
+
             present_files, missing_files = verify_cursor_rules_setup(str(rules_dir))
-            
+
             assert len(present_files) == 2
             assert len(missing_files) == 2
             assert set(present_files) == set(present_rule_files)
@@ -279,9 +291,9 @@ class TestVerifyCursorRulesSetup:
         """Test verification when rules directory doesn't exist."""
         with tempfile.TemporaryDirectory() as temp_dir:
             rules_dir = Path(temp_dir) / "nonexistent" / ".cursor" / "rules"
-            
+
             present_files, missing_files = verify_cursor_rules_setup(str(rules_dir))
-            
+
             assert len(present_files) == 0
             assert len(missing_files) == len(CURSOR_RULE_FILES)
             assert set(missing_files) == set(CURSOR_RULE_FILES)
@@ -296,24 +308,24 @@ class TestRemoveCursorRules:
             temp_path = Path(temp_dir)
             rules_dir = temp_path / ".cursor" / "rules"
             rules_dir.mkdir(parents=True)
-            
+
             # Create rule files
             rule_paths = []
             for rule_file in CURSOR_RULE_FILES:
                 rule_path = rules_dir / rule_file
                 rule_path.write_text("Rule content")
                 rule_paths.append(rule_path)
-            
+
             # Verify files exist
             for rule_path in rule_paths:
                 assert rule_path.exists()
-            
+
             # Remove rules
-            with patch('dungeon_master.utils.cursor_setup.console'):
+            with patch("dungeon_master.utils.cursor_setup.console"):
                 result = remove_cursor_rules(str(rules_dir), verbose=False)
-            
+
             assert result is True
-            
+
             # Verify files are removed
             for rule_path in rule_paths:
                 assert not rule_path.exists()
@@ -322,9 +334,9 @@ class TestRemoveCursorRules:
         """Test removal when no rule files exist."""
         with tempfile.TemporaryDirectory() as temp_dir:
             rules_dir = Path(temp_dir) / ".cursor" / "rules"
-            
-            with patch('dungeon_master.utils.cursor_setup.console'):
+
+            with patch("dungeon_master.utils.cursor_setup.console"):
                 result = remove_cursor_rules(str(rules_dir), verbose=False)
-            
+
             # Should still return True (success) even if no files to remove
-            assert result is True 
+            assert result is True

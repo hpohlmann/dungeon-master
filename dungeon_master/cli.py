@@ -8,6 +8,7 @@ a pre-commit hook system that enforces documentation updates alongside code chan
 """
 
 import sys
+
 import click
 from rich.console import Console
 
