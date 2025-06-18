@@ -1,0 +1,11 @@
+# Production dependencies for Dungeon Master
+# These are the minimum required packages to run the application
+
+# CLI framework
+click>=8.0.0
+
+# Rich console output and formatting
+rich>=10.0.0
+
+# Git repository operations
+gitpython>=3.1.0 

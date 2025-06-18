@@ -59,6 +59,94 @@ dm review
 - `dm create_lore` - Create missing documentation files
 - `dm map` - Generate visual repository structure
 
+## Development
+
+### Setting Up Development Environment
+
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+cd dm
+```
+
+2. Create and activate a virtual environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+3. Install development dependencies:
+
+```bash
+pip install -r requirements-dev.txt
+pip install -e .
+```
+
+Or use the Makefile shortcut:
+
+```bash
+make dev-setup
+```
+
+### Development Commands
+
+We provide a Makefile with common development tasks:
+
+```bash
+make help        # Show available commands
+make test        # Run tests with coverage
+make lint        # Run linting checks
+make format      # Format code with black and isort
+make type-check  # Run mypy type checking
+make clean       # Clean up build artifacts
+make build       # Build the package
+```
+
+### Requirements Files
+
+- `requirements.txt` - Production dependencies only
+- `requirements-dev.txt` - Development dependencies (includes production deps)
+
+### Code Quality
+
+This project uses several tools to maintain code quality:
+
+- **Black** - Code formatting
+- **isort** - Import sorting
+- **flake8** - Linting
+- **mypy** - Type checking
+- **pytest** - Testing framework
+- **pytest-cov** - Test coverage
+
+Run `make lint` to check all quality standards, or `make format` to auto-fix formatting issues.
+
+### Testing
+
+Run tests with coverage reporting:
+
+```bash
+make test
+```
+
+Or run pytest directly:
+
+```bash
+pytest --cov=dungeon_master --cov-report=html
+```
+
+### Package Structure
+
+```
+dungeon_master/
+├── cli.py              # Main CLI entry point
+├── commands/           # Command implementations
+├── core/              # Core functionality
+├── utils/             # Utility modules
+└── hooks/             # Git hook implementations
+```
+
 ## Documentation
 
 For full documentation, see the [docs](docs/) directory.
