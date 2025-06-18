@@ -31,7 +31,7 @@ def get_templates_directory() -> Path:
     Get the path to the templates/cursor_rules directory.
     
     Returns:
-        Path to the templates/cursor_rules directory
+        Path to the templates/cursor_rules directory within the package
         
     Raises:
         FileNotFoundError: If the templates directory doesn't exist
@@ -39,9 +39,8 @@ def get_templates_directory() -> Path:
     # Get the package directory (dungeon_master)
     package_dir = Path(__file__).parent.parent
     
-    # Templates should be in the project root, one level up from package
-    project_root = package_dir.parent
-    templates_dir = project_root / "templates" / "cursor_rules"
+    # Templates are now inside the package
+    templates_dir = package_dir / "templates" / "cursor_rules"
     
     if not templates_dir.exists():
         raise FileNotFoundError(f"Templates directory not found: {templates_dir}")

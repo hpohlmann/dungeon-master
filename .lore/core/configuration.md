@@ -40,7 +40,7 @@ The configuration module enables users to customize Dungeon Master behavior whil
 
 ### Environment Detection
 
-- `is_test_environment()` - Detects test execution environment
+- `is_test_environment()` - Detects test execution environment with precise detection logic
 - `get_lore_directory()` - Returns appropriate lore directory for environment
 - `ensure_lore_directory_isolation()` - Sets up test environment isolation
 
@@ -141,7 +141,7 @@ flowchart TD
     B --> C{Check Test Environment}
     C -->|pytest in sys.modules| D[Test Mode]
     C -->|DM_TEST_MODE=true| D
-    C -->|test in argv| D
+    C -->|pytest runner detected| D
     C -->|None detected| E[Production Mode]
 
     D --> F[Use .lore.dev directory]
@@ -205,6 +205,7 @@ flowchart TB
 - Test environment automatically uses `.lore.dev` directory
 - Prevents test artifacts from contaminating production documentation
 - Test directory automatically added to `.gitignore`
+- **Precise Detection**: Environment detection avoids false positives from filenames containing "test"
 
 **Validation Features:**
 
@@ -224,6 +225,14 @@ flowchart TB
 - Configuration is cached after first load
 - File operations are minimized
 - Validation is performed only when settings change
+
+**Test Environment Detection:**
+
+- Detects pytest/unittest in sys.modules
+- Checks DM_TEST_MODE environment variable
+- Identifies actual pytest runner execution
+- **Fixed**: No longer triggered by filenames containing "test" or directory names
+- Prevents false positive detection when working in test-related directories
 
 ---
 

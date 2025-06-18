@@ -37,7 +37,10 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 include = ["dungeon_master*"]
-exclude = ["tests*", "templates*", "examples*"]
+exclude = ["tests*", "examples*"]
+
+[tool.setuptools.package-data]
+dungeon_master = ["templates/**/*"]
 
 [project.optional-dependencies]
 dev = [

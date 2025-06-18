@@ -47,9 +47,10 @@ The CLI commands are built using Click framework with rich console output, provi
 
 #### Validation Command (`validate.py`)
 
-- `run_validate()` - Core pre-commit hook functionality
+- `run_validate()` - Core pre-commit hook functionality with strict enforcement
 - Validates documentation completeness and currency
 - Checks for template-only files
+- **STRICT MODE**: Blocks commits when documentation needs updates (changed code requires updated docs)
 - Detects files needing updates based on git changes
 - Returns proper exit codes for git hook integration
 
@@ -217,17 +218,17 @@ stateDiagram-v2
     CheckingGitChanges --> GeneratingResults
 
     GeneratingResults --> Success: All valid
-    GeneratingResults --> Warnings: Needs updates
-    GeneratingResults --> Failure: Missing/incomplete
+    GeneratingResults --> Failure: Missing/incomplete/outdated
 
     Success --> [*]
-    Warnings --> [*]
     Failure --> BlockCommit
     BlockCommit --> [*]
 
     note right of BlockCommit
         Exit code 1
         Blocks git commit
+        STRICT MODE: No warnings
+        All issues block commits
     end note
 ```
 
@@ -244,6 +245,8 @@ stateDiagram-v2
 
 - 0: Success (allows git commit to proceed)
 - 1: Failure (blocks git commit)
+- **STRICT ENFORCEMENT**: All documentation issues block commits
+- No warning-only mode - missing, incomplete, or outdated documentation prevents commits
 - Proper exit codes essential for pre-commit hook functionality
 
 **User Experience Features:**

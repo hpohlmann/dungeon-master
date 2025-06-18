@@ -410,8 +410,10 @@ def is_test_environment() -> bool:
         "pytest" in sys.modules or
         "unittest" in sys.modules or
         os.getenv("DM_TEST_MODE") == "true" or
-        "test" in sys.argv[0].lower() or  # Running via test command
-        any("test" in arg for arg in sys.argv)  # Test-related arguments
+        # Check for actual test runners, not just filenames containing "test"
+        (len(sys.argv) > 1 and sys.argv[0].endswith("pytest")) or  # pytest runner
+        (len(sys.argv) > 1 and "pytest" in sys.argv) or  # pytest in arguments
+        (len(sys.argv) > 1 and "-m" in sys.argv and "pytest" in sys.argv)  # python -m pytest
     )
 
 

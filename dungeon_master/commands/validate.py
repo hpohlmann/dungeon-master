@@ -88,9 +88,9 @@ def run_validate():
         # Check for files that need updates based on git changes
         console.print("📝 Checking for files needing updates...")
         changed_files = get_changed_files()
+        needs_update = []
         
         if changed_files:
-            needs_update = []
             
             for lore_file_path, tracked_files in mapping.items():
                 # Check if any tracked files for this lore file have changed
@@ -102,7 +102,7 @@ def run_validate():
                         lore_relative = str(Path(lore_root) / lore_file_path)
                         if lore_relative not in changed_files:
                             needs_update.append((lore_file_path, changed_tracked))
-                            console.print(f"  ⚠️ [yellow]NEEDS UPDATE: {lore_root}/{lore_file_path}[/yellow]")
+                            console.print(f"  ❌ [red]NEEDS UPDATE: {lore_root}/{lore_file_path}[/red]")
                             console.print(f"     [dim]Changed files: {', '.join(changed_tracked)}[/dim]")
                         else:
                             console.print(f"  ✅ [green]UPDATED: {lore_root}/{lore_file_path}[/green]")
@@ -116,9 +116,8 @@ def run_validate():
         console.print()
         
         # Summary and validation result
-        has_errors = bool(missing_files or template_files or invalid_files)
-        has_warnings = bool(changed_files and any(lore_file for lore_file, _ in mapping.items() 
-                                                if any(f in changed_files for f in mapping[lore_file])))
+        has_errors = bool(missing_files or template_files or invalid_files or needs_update)
+        has_warnings = False  # All issues are now treated as errors
         
         if has_errors:
             console.print("❌ [bold red]VALIDATION FAILED[/bold red]")
@@ -145,21 +144,21 @@ def run_validate():
                     console.print(f"    [dim]Add missing sections: {', '.join(validation['missing_sections'])}[/dim]")
                 console.print()
             
-            console.print("[bold]❗ COMMIT BLOCKED[/bold]")
+            if needs_update:
+                console.print("[red]DOCUMENTATION NEEDS UPDATES:[/red]")
+                for lore_file, changed_tracked in needs_update:
+                    console.print(f"  → UPDATE {lore_root}/{lore_file}")
+                    console.print(f"    [dim]Code changed: {', '.join(changed_tracked)}[/dim]")
+                    console.print(f"    [dim]Review and update documentation to reflect changes[/dim]")
+                console.print()
+            
+            console.print("🛑 [bold red]COMMIT BLOCKED[/bold red]")
             console.print("Fix the above issues before committing.")
             return False
         
-        elif has_warnings:
-            console.print("⚠️ [bold yellow]VALIDATION WARNING[/bold yellow]")
-            console.print("Code changes detected but documentation may need updates.")
-            console.print("Review your documentation before committing.")
-            console.print()
-            console.print("✅ [green]Commit allowed (with warnings)[/green]")
-            return True
-        
         else:
             console.print("✅ [bold green]VALIDATION PASSED[/bold green]")
-            console.print("All documentation is properly maintained.")
+            console.print("All documentation is properly maintained and up-to-date.")
             return True
             
     except Exception as e:
