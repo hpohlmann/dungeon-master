@@ -25,7 +25,10 @@ from dungeon_master.utils.config import (
     merge_config_with_args,
     get_config_path,
     ConfigurationError,
-    DEFAULT_CONFIG
+    DEFAULT_CONFIG,
+    is_test_environment,
+    get_lore_directory,
+    ensure_lore_directory_isolation
 )
 
 
@@ -515,6 +518,155 @@ class TestDefaultConfiguration:
         assert config['encoding'] == 'utf-8'
         assert '.git' in config['excludedDirectories']
         assert '*.pyc' in config['excludedFilePatterns']
+        # Test that examples and tests are excluded by default
+        assert 'examples' in config['excludedDirectories']
+        assert 'tests' in config['excludedDirectories']
+
+
+class TestEnvironmentDetection:
+    """Test environment detection functionality."""
+
+    def test_is_test_environment_pytest(self):
+        """Test detection when running under pytest."""
+        # This should be True since we're running under pytest
+        assert is_test_environment() is True
+
+    def test_is_test_environment_env_var(self):
+        """Test detection via environment variable."""
+        with patch.dict(os.environ, {'DM_TEST_MODE': 'true'}):
+            assert is_test_environment() is True
+        
+        with patch.dict(os.environ, {'DM_TEST_MODE': 'false'}):
+            # Still True because we're running under pytest
+            assert is_test_environment() is True
+
+    def test_get_lore_directory_test_mode(self):
+        """Test lore directory in test mode."""
+        # Should return .lore.dev when in test environment
+        lore_dir = get_lore_directory()
+        assert lore_dir == ".lore.dev"
+
+    def test_get_lore_directory_production_mode(self):
+        """Test lore directory in production mode."""
+        # Mock to simulate production environment
+        with patch('dungeon_master.utils.config.is_test_environment', return_value=False):
+            lore_dir = get_lore_directory()
+            assert lore_dir == ".lore"
+
+    def test_get_lore_directory_with_config(self):
+        """Test lore directory with custom config."""
+        custom_config = {"loreDirectory": ".custom_lore"}
+        
+        # In production mode, should use config value
+        with patch('dungeon_master.utils.config.is_test_environment', return_value=False):
+            lore_dir = get_lore_directory(custom_config)
+            assert lore_dir == ".custom_lore"
+        
+        # In test mode, should still return .lore.dev regardless of config
+        lore_dir = get_lore_directory(custom_config)
+        assert lore_dir == ".lore.dev"
+
+    def test_ensure_lore_directory_isolation(self, temp_dir):
+        """Test lore directory isolation setup."""
+        old_cwd = os.getcwd()
+        try:
+            os.chdir(temp_dir)
+            
+            # Should create .lore.dev directory in test mode
+            result = ensure_lore_directory_isolation()
+            assert result is True
+            
+            lore_dev_path = temp_dir / ".lore.dev"
+            assert lore_dev_path.exists()
+            assert lore_dev_path.is_dir()
+        finally:
+            os.chdir(old_cwd)
+
+    def test_ensure_lore_directory_isolation_gitignore(self, temp_dir):
+        """Test that .lore.dev is added to .gitignore."""
+        old_cwd = os.getcwd()
+        try:
+            os.chdir(temp_dir)
+            
+            # Create initial .gitignore
+            gitignore_path = temp_dir / ".gitignore"
+            gitignore_path.write_text("# Initial content\n*.pyc\n")
+            
+            # Run isolation setup
+            ensure_lore_directory_isolation()
+            
+            # Check that .lore.dev was added
+            gitignore_content = gitignore_path.read_text()
+            assert ".lore.dev/" in gitignore_content
+            assert "*.pyc" in gitignore_content  # Original content preserved
+        finally:
+            os.chdir(old_cwd)
+
+
+class TestEnvironmentIntegration:
+    """Test integration between environment detection and other systems."""
+
+    def test_template_system_uses_correct_directory(self, temp_dir):
+        """Test that template system uses correct lore directory."""
+        from dungeon_master.core.template import create_lore_file
+        
+        old_cwd = os.getcwd()
+        try:
+            os.chdir(temp_dir)
+            
+            # In test mode, should create in .lore.dev
+            result = create_lore_file(
+                lore_path="test.md",
+                tracked_files=["test.py"]
+            )
+            
+            assert result is True
+            
+            # File should be created in .lore.dev, not .lore
+            lore_dev_file = temp_dir / ".lore.dev" / "test.md"
+            lore_file = temp_dir / ".lore" / "test.md"
+            
+            assert lore_dev_file.exists()
+            assert not lore_file.exists()
+        finally:
+            os.chdir(old_cwd)
+
+    def test_decorator_parser_respects_exclusions(self, temp_dir):
+        """Test that decorator parser respects the new exclusion configuration."""
+        from dungeon_master.core.decorator_parser import scan_repository_for_lore_decorators
+        
+        old_cwd = os.getcwd()
+        try:
+            os.chdir(temp_dir)
+            
+            # Create test files in various directories
+            (temp_dir / "src").mkdir()
+            (temp_dir / "examples").mkdir()
+            (temp_dir / "tests").mkdir()
+            
+            # Create files with track_lore decorators
+            src_file = temp_dir / "src" / "main.py"
+            src_file.write_text('# track_lore("main.md")\ndef main(): pass')
+            
+            example_file = temp_dir / "examples" / "example.py"
+            example_file.write_text('# track_lore("example.md")\ndef example(): pass')
+            
+            test_file = temp_dir / "tests" / "test.py"
+            test_file.write_text('# track_lore("test.md")\ndef test(): pass')
+            
+            # Scan with default config (should exclude examples and tests)
+            config = load_config()
+            mapping = scan_repository_for_lore_decorators(
+                repo_path=temp_dir,
+                config=config
+            )
+            
+            # Should only find src file, not examples or tests
+            assert "main.md" in mapping
+            assert "example.md" not in mapping
+            assert "test.md" not in mapping
+        finally:
+            os.chdir(old_cwd)
 
 
 if __name__ == '__main__':

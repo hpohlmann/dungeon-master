@@ -183,7 +183,7 @@ def create_lore_file(
     lore_path: str,
     tracked_files: Optional[List[str]] = None,
     template: Optional[str] = None,
-    lore_root: str = ".lore",
+    lore_root: Optional[str] = None,
     custom_vars: Optional[Dict[str, Any]] = None,
     overwrite: bool = False
 ) -> bool:
@@ -194,7 +194,7 @@ def create_lore_file(
         lore_path: Relative path to the lore file (e.g., "api/payments.md")
         tracked_files: List of source files that reference this lore
         template: Custom template to use (uses default if None)
-        lore_root: Root directory for lore files (default: ".lore")
+        lore_root: Root directory for lore files (auto-detected if None)
         custom_vars: Custom variables for template population
         overwrite: Whether to overwrite existing files
         
@@ -210,6 +210,16 @@ def create_lore_file(
         
     # Clean and validate the lore path
     lore_path = lore_path.strip().replace('\\', '/')
+    
+    # Auto-detect lore root if not provided
+    if lore_root is None:
+        try:
+            from dungeon_master.utils.config import get_lore_directory, ensure_lore_directory_isolation
+            ensure_lore_directory_isolation()
+            lore_root = get_lore_directory()
+        except ImportError:
+            # Fallback for when config module is not available
+            lore_root = ".lore"
     
     # Ensure the lore path is relative to lore directory
     full_lore_path = Path(lore_root) / lore_path
@@ -251,7 +261,7 @@ def create_lore_file(
 def create_multiple_lore_files(
     lore_mapping: Dict[str, List[str]],
     template: Optional[str] = None,
-    lore_root: str = ".lore",
+    lore_root: Optional[str] = None,
     custom_vars: Optional[Dict[str, Any]] = None,
     overwrite: bool = False
 ) -> Dict[str, bool]:
@@ -261,13 +271,23 @@ def create_multiple_lore_files(
     Args:
         lore_mapping: Dictionary mapping lore paths to lists of tracked files
         template: Custom template to use (uses default if None)
-        lore_root: Root directory for lore files
+        lore_root: Root directory for lore files (auto-detected if None)
         custom_vars: Custom variables for template population
         overwrite: Whether to overwrite existing files
         
     Returns:
         Dictionary mapping lore paths to creation success (True/False)
     """
+    # Auto-detect lore root if not provided
+    if lore_root is None:
+        try:
+            from dungeon_master.utils.config import get_lore_directory, ensure_lore_directory_isolation
+            ensure_lore_directory_isolation()
+            lore_root = get_lore_directory()
+        except ImportError:
+            # Fallback for when config module is not available
+            lore_root = ".lore"
+    
     results = {}
     
     for lore_path, tracked_files in lore_mapping.items():
