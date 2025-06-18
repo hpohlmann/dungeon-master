@@ -1,3 +1,4 @@
+# track_lore("core/configuration.md")
 """
 Configuration System for Dungeon Master
 
@@ -7,6 +8,7 @@ for Dungeon Master using dmconfig.json with sensible defaults and validation.
 
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Dict, Any, Optional, Union, List
 from rich.console import Console
@@ -44,7 +46,9 @@ DEFAULT_CONFIG = {
         "node_modules", ".next", ".nuxt",
         ".venv", "venv", "env",
         "build", "dist", ".build",
-        ".taskmaster"
+        ".taskmaster",
+        "examples",  # Exclude example files from production documentation
+        "tests"      # Exclude test files from production documentation
     ],
     "excludedFilePatterns": [
         "*.pyc", "*.pyo", "*.pyd",
@@ -393,3 +397,62 @@ def merge_config_with_args(config: Dict[str, Any], **kwargs) -> Dict[str, Any]:
                 merged_config[mapping] = value
     
     return merged_config
+
+
+def is_test_environment() -> bool:
+    """
+    Detect if running in test environment.
+    
+    Returns:
+        True if running in test environment, False otherwise
+    """
+    return (
+        "pytest" in sys.modules or
+        "unittest" in sys.modules or
+        os.getenv("DM_TEST_MODE") == "true" or
+        "test" in sys.argv[0].lower() or  # Running via test command
+        any("test" in arg for arg in sys.argv)  # Test-related arguments
+    )
+
+
+def get_lore_directory(config: Optional[Dict[str, Any]] = None) -> str:
+    """
+    Get appropriate lore directory based on environment.
+    
+    Args:
+        config: Optional configuration dictionary
+        
+    Returns:
+        Lore directory path ('.lore.dev' for test, '.lore' for production)
+    """
+    if is_test_environment():
+        return ".lore.dev"
+    
+    if config is None:
+        config = load_config()
+    
+    return config.get("loreDirectory", ".lore")
+
+
+def ensure_lore_directory_isolation() -> bool:
+    """
+    Ensure test environment is properly isolated.
+    
+    Returns:
+        True if environment is properly set up, False otherwise
+    """
+    if is_test_environment():
+        lore_dev_path = Path(".lore.dev")
+        lore_dev_path.mkdir(exist_ok=True)
+        
+        # Add .lore.dev to .gitignore if not already there
+        gitignore_path = Path(".gitignore")
+        if gitignore_path.exists():
+            content = gitignore_path.read_text()
+            if ".lore.dev" not in content:
+                with open(gitignore_path, "a") as f:
+                    f.write("\n# Dungeon Master test environment\n.lore.dev/\n")
+        
+        return True
+    
+    return True  # Production environment doesn't need special setup

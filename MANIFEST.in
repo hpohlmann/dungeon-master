@@ -1,0 +1,33 @@
+include README.md
+include LICENSE
+include requirements.txt
+include requirements-dev.txt
+
+# Include template files
+recursive-include templates *
+recursive-include dungeon_master/templates *
+
+# Include documentation
+recursive-include docs *.md
+recursive-include docs *.rst
+
+# Include example files
+recursive-include examples *
+
+# Exclude test files and development artifacts
+recursive-exclude tests *
+recursive-exclude htmlcov *
+exclude .coverage
+exclude .pytest_cache
+exclude .mypy_cache
+exclude .lore*
+exclude .dmcache*
+exclude dmconfig.json
+
+# Exclude build artifacts
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.pyd
+global-exclude __pycache__
+global-exclude .DS_Store
+global-exclude .git* 

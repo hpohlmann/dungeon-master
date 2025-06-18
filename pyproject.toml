@@ -3,23 +3,36 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "dungeon-master"
-version = "0.1.0"
-description = "A lightweight pre-commit hook system designed to enforce documentation updates alongside code changes"
+name = "cursor-dungeon-master"
+version = "0.4.0"
+description = "Context-tracking pre-commit tool for Cursor AI integration with comprehensive documentation enforcement"
 readme = "README.md"
 authors = [
-    {name = "Dungeon Master Team"}
+    {name = "Dungeon Master Team", email = "team@dungeonmaster.dev"}
 ]
-license = "MIT"
+maintainers = [
+    {name = "Dungeon Master Team", email = "team@dungeonmaster.dev"}
+]
+license = {text = "MIT"}
+keywords = ["documentation", "git", "pre-commit", "context", "tracking", "cursor", "ai"]
 classifiers = [
-    "Programming Language :: Python :: 3",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License", 
     "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Version Control :: Git",
 ]
 requires-python = ">=3.8"
 dependencies = [
     "click>=8.0.0",
     "rich>=10.0.0",
-    "gitpython>=3.1.0",
 ]
 
 [tool.setuptools.packages.find]
@@ -29,9 +42,12 @@ exclude = ["tests*", "templates*", "examples*"]
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
     "black>=22.0.0",
     "isort>=5.0.0",
     "flake8>=4.0.0",
+    "twine>=4.0.0",
+    "build>=0.8.0",
 ]
 
 [project.scripts]
@@ -44,3 +60,30 @@ target-version = ["py38"]
 [tool.isort]
 profile = "black"
 line_length = 88
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--verbose --tb=short"
+
+[tool.coverage.run]
+source = ["dungeon_master"]
+omit = [
+    "*/tests/*",
+    "*/examples/*",
+    "*/templates/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+]

@@ -1,3 +1,4 @@
+# track_lore("integrations/cursor.md")
 """
 Cursor Rules Setup Utilities
 

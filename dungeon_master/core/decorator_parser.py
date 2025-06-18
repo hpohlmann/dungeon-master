@@ -1,3 +1,4 @@
+# track_lore("core/engine.md")
 """
 Lore Decorator Parser
 
@@ -11,10 +12,10 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 # Regex patterns for track_lore decorators
-# Python: # track_lore("file.md")
+# Python: Matches comments with the track_lore function call syntax
 PY_PATTERN = r'#\s*track_lore\(\s*["\']([^"\']+)["\']\s*\)'
 
-# TypeScript/JavaScript: // track_lore("file.md")  
+# TypeScript/JavaScript: Matches comments with the track_lore function call syntax
 TS_PATTERN = r'//\s*track_lore\(\s*["\']([^"\']+)["\']\s*\)'
 
 # Supported file extensions
@@ -22,14 +23,16 @@ PYTHON_EXTENSIONS = {'.py', '.pyx', '.pyi'}
 TYPESCRIPT_EXTENSIONS = {'.ts', '.tsx', '.js', '.jsx'}
 ALL_SUPPORTED_EXTENSIONS = PYTHON_EXTENSIONS | TYPESCRIPT_EXTENSIONS
 
-# Directories to skip during repository scanning
-SKIP_DIRECTORIES = {
+# Default directories to skip during repository scanning (fallback if no config)
+DEFAULT_SKIP_DIRECTORIES = {
     '.git', '.hg', '.svn',  # Version control
     '__pycache__', '.pytest_cache', '.mypy_cache',  # Python cache
     'node_modules', '.next', '.nuxt',  # JavaScript/Node
     '.venv', 'venv', 'env',  # Virtual environments
     'build', 'dist', '.build',  # Build artifacts
-    '.taskmaster'  # Our own task management directory (but not .lore!)
+    '.taskmaster',  # Task management directory
+    'examples',  # Example files
+    'tests'  # Test files
 }
 
 ## TODO: Add in .gitignore file skips during repository scanning
@@ -60,24 +63,32 @@ def is_supported_file(file_path: Path) -> bool:
     return get_file_extension(file_path) in ALL_SUPPORTED_EXTENSIONS
 
 
-def should_skip_directory(dir_path: Path) -> bool:
+def should_skip_directory(dir_path: Path, excluded_directories: Optional[List[str]] = None) -> bool:
     """
     Check if a directory should be skipped during repository scanning.
     
     Args:
         dir_path: Path object for the directory
+        excluded_directories: Optional list of directory names to exclude (from config)
         
     Returns:
         True if the directory should be skipped, False otherwise
     """
     dir_name = dir_path.name.lower()
     
+    # Use provided exclusions or fall back to defaults
+    if excluded_directories is None:
+        excluded_directories = list(DEFAULT_SKIP_DIRECTORIES)
+    
+    # Convert to lowercase for case-insensitive comparison
+    excluded_directories_lower = [d.lower() for d in excluded_directories]
+    
     # Skip known directories that shouldn't contain trackable code
-    if dir_name in SKIP_DIRECTORIES:
+    if dir_name in excluded_directories_lower:
         return True
         
-    # Skip hidden directories (starting with .) except .lore
-    if dir_name.startswith('.') and dir_name != '.lore':
+    # Skip hidden directories (starting with .) except .lore and .lore.dev
+    if dir_name.startswith('.') and dir_name not in {'.lore', '.lore.dev'}:
         return True
         
     return False
@@ -167,7 +178,8 @@ def extract_lore_paths_safe(file_path: Path) -> List[str]:
 def scan_repository_for_lore_decorators(
     repo_path: Optional[Path] = None,
     include_patterns: Optional[List[str]] = None,
-    exclude_patterns: Optional[List[str]] = None
+    exclude_patterns: Optional[List[str]] = None,
+    config: Optional[Dict] = None
 ) -> Dict[str, List[str]]:
     """
     Scan a repository for track_lore decorators and build a mapping.
@@ -176,6 +188,7 @@ def scan_repository_for_lore_decorators(
         repo_path: Root path to scan (defaults to current directory)
         include_patterns: List of glob patterns to include (overrides default extensions)
         exclude_patterns: List of glob patterns to exclude
+        config: Optional configuration dictionary with exclusion settings
         
     Returns:
         Dictionary mapping lore file paths to lists of source files that reference them
@@ -193,34 +206,53 @@ def scan_repository_for_lore_decorators(
         
     if not repo_path.exists():
         raise FileNotFoundError(f"Repository path not found: {repo_path}")
+    
+    # Get exclusion settings from config if provided
+    excluded_directories = None
+    if config:
+        excluded_directories = config.get("excludedDirectories", list(DEFAULT_SKIP_DIRECTORIES))
         
     lore_mapping: Dict[str, List[str]] = {}
     
-    # If include_patterns is specified, use those; otherwise use default extensions
-    if include_patterns:
-        file_paths = []
-        for pattern in include_patterns:
-            file_paths.extend(repo_path.glob(pattern))
-    else:
-        # Scan for all supported file types
-        file_paths = []
-        for ext in ALL_SUPPORTED_EXTENSIONS:
-            file_paths.extend(repo_path.glob(f'**/*{ext}'))
+    # Use custom directory walker that respects exclusions from the start
+    # This avoids the performance issue of globbing through virtual environments
+    def walk_directory(current_path: Path) -> List[Path]:
+        """Walk directory tree, skipping excluded directories."""
+        files = []
+        
+        try:
+            for item in current_path.iterdir():
+                if item.is_dir():
+                    # Skip excluded directories entirely - don't even recurse into them
+                    if should_skip_directory(item, excluded_directories):
+                        continue
+                    # Recursively walk non-excluded directories
+                    files.extend(walk_directory(item))
+                elif item.is_file():
+                    # Only include supported file types (unless custom include_patterns)
+                    if include_patterns:
+                        # If custom patterns, check against them
+                        if any(item.match(pattern) for pattern in include_patterns):
+                            files.append(item)
+                    else:
+                        # Default: only supported extensions
+                        if is_supported_file(item):
+                            files.append(item)
+        except (PermissionError, OSError):
+            # Skip directories we can't read
+            pass
+            
+        return files
+    
+    # Get all files using our custom walker (no more glob performance issues!)
+    file_paths = walk_directory(repo_path)
     
     for file_path in file_paths:
-        # Skip files in directories we should ignore
-        if any(should_skip_directory(parent) for parent in file_path.parents):
-            continue
-            
-        # Skip files that match exclude patterns
+        # Apply additional exclude patterns if specified
         if exclude_patterns:
             if any(file_path.match(pattern) for pattern in exclude_patterns):
                 continue
         
-        # Only process supported file types (unless custom include_patterns)
-        if not include_patterns and not is_supported_file(file_path):
-            continue
-            
         # Extract lore paths from this file
         lore_paths = extract_lore_paths_safe(file_path)
         

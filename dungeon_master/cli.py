@@ -1,3 +1,4 @@
+# track_lore("cli/main-interface.md")
 #!/usr/bin/env python3
 """
 Dungeon Master CLI - Documentation enforcement system.
@@ -6,6 +7,7 @@ This module provides the main command-line interface for Dungeon Master,
 a pre-commit hook system that enforces documentation updates alongside code changes.
 """
 
+import sys
 import click
 from rich.console import Console
 
@@ -36,7 +38,9 @@ def init():
     """
     from dungeon_master.commands.init import run_init
 
-    run_init()
+    success = run_init()
+    if not success:
+        sys.exit(1)
 
 
 @main.command()
@@ -49,7 +53,9 @@ def validate():
     """
     from dungeon_master.commands.validate import run_validate
 
-    run_validate()
+    success = run_validate()
+    if not success:
+        sys.exit(1)
 
 
 @main.command()
@@ -69,7 +75,9 @@ def review(mark_reviewed):
     """
     from dungeon_master.commands.review import run_review
 
-    run_review(mark_reviewed)
+    success = run_review(mark_reviewed)
+    if not success:
+        sys.exit(1)
 
 
 @main.command()
@@ -86,7 +94,9 @@ def create_lore(lore_file):
     """
     from dungeon_master.commands.create_lore import run_create_lore
 
-    run_create_lore(lore_file)
+    success = run_create_lore(lore_file)
+    if not success:
+        sys.exit(1)
 
 
 @main.command()
@@ -98,7 +108,9 @@ def map():
     """
     from dungeon_master.commands.map import run_map
 
-    run_map()
+    success = run_map()
+    if not success:
+        sys.exit(1)
 
 
 # Command aliases for convenience
