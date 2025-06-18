@@ -10,10 +10,9 @@ readme = "README.md"
 authors = [
     {name = "Dungeon Master Team"}
 ]
-license = {text = "MIT"}
+license = "MIT"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 requires-python = ">=3.8"
@@ -22,6 +21,10 @@ dependencies = [
     "rich>=10.0.0",
     "gitpython>=3.1.0",
 ]
+
+[tool.setuptools.packages.find]
+include = ["dungeon_master*"]
+exclude = ["tests*", "templates*", "examples*"]
 
 [project.optional-dependencies]
 dev = [

@@ -1,0 +1,21 @@
+# Development dependencies for Dungeon Master
+# Includes both production and development dependencies
+
+# Include production requirements
+-r requirements.txt
+
+# Development and testing tools
+pytest>=7.0.0
+pytest-cov>=4.0.0  # Test coverage reporting
+pytest-mock>=3.10.0  # Mocking utilities for tests
+
+# Code formatting and linting
+black>=22.0.0
+isort>=5.0.0
+flake8>=4.0.0
+mypy>=1.0.0  # Type checking
+
+# Development utilities
+pre-commit>=3.0.0  # Pre-commit hooks for development
+twine>=4.0.0  # For publishing packages
+build>=0.10.0  # For building packages 
