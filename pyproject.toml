@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "cursor-dungeon-master"
 version = "0.4.0"
-description = "Context-tracking pre-commit tool for Cursor AI integration with comprehensive documentation enforcement"
+description = "Context-tracking pre-commit tool for Cursor integration with comprehensive documentation enforcement"
 readme = "README.md"
 authors = [
     {name = "Dungeon Master Team", email = "team@dungeonmaster.dev"}
