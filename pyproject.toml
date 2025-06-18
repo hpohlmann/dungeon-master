@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cursor-dungeon-master"
-version = "0.4.0"
+version = "0.4.0.post1"
 description = "Context-tracking pre-commit tool for Cursor integration with comprehensive documentation enforcement"
 readme = "README.md"
 authors = [
@@ -13,12 +13,11 @@ authors = [
 maintainers = [
     {name = "Dungeon Master Team", email = "team@dungeonmaster.dev"}
 ]
-license = {text = "MIT"}
+license = "MIT"
 keywords = ["documentation", "git", "pre-commit", "context", "tracking", "cursor", "ai"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License", 
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
