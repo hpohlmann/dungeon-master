@@ -1,9 +1,9 @@
+# track_lore("core/engine.md")
 """
 Lore File Template System
 
-This module provides functionality to create standardized lore documentation files
-using templates with automatic placeholder population. It follows the template
-structure defined in the PRD with required sections and mermaid diagrams.
+This module provides functionality for creating and managing lore file templates.
+It handles template population, file creation, and validation of lore content.
 """
 
 import os

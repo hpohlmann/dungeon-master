@@ -1,3 +1,4 @@
+# track_lore("commands/cli-system.md")
 """
 Initialize Dungeon Master in the current repository.
 

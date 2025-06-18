@@ -1,3 +1,4 @@
+# track_lore("core/configuration.md")
 """
 Configuration System for Dungeon Master
 

@@ -1,3 +1,4 @@
+# track_lore("core/engine.md")
 """
 Lore Decorator Parser
 
