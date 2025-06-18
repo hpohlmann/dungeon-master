@@ -17,7 +17,7 @@ The Cursor integration module manages the setup and maintenance of Cursor IDE ru
 
 **Internal Dependencies:**
 
-- Rule templates from `templates/cursor_rules/` directory
+- Rule templates from `dungeon_master/templates/cursor_rules/` package directory
 
 ## Key Functions/Components
 
@@ -29,8 +29,9 @@ The Cursor integration module manages the setup and maintenance of Cursor IDE ru
 
 ### Template Operations
 
-- `get_templates_directory()` - Locates the templates directory
+- `get_templates_directory()` - Locates the templates directory within the package
 - `copy_rule_file()` - Copies individual rule files with validation
+- `create_cursor_rules_directory()` - Creates the .cursor/rules directory structure
 
 ## Usage Examples
 
@@ -49,11 +50,11 @@ print(f"Copied {len(copied)} rules, {len(failed)} failed")
 ```mermaid
 sequenceDiagram
     participant DM as Dungeon Master
-    participant Templates as Rule Templates
+    participant Package as Package Templates
     participant Cursor as .cursor/rules/
 
-    DM->>Templates: Locate template files
-    Templates-->>DM: List of rule files
+    DM->>Package: Locate template files in package
+    Package-->>DM: List of rule files
 
     loop For each rule file
         DM->>Cursor: Copy rule file
@@ -62,6 +63,12 @@ sequenceDiagram
 
     DM->>Cursor: Verify installation
     Cursor-->>DM: Installation status
+
+    note over Package
+        Templates located at:
+        dungeon_master/templates/cursor_rules/
+        (packaged with pip distribution)
+    end note
 ```
 
 ## Notes
@@ -78,6 +85,13 @@ sequenceDiagram
 - Creates `.cursor/rules/` directory if needed
 - Copies all template files with verification
 - Reports success/failure for each file
+
+**Packaging Integration:**
+
+- Templates are packaged within the `dungeon_master` module
+- Ensures templates are available in pip installations
+- **Fixed**: Template discovery now works correctly with packaged distributions
+- No longer depends on project root structure for template location
 
 ---
 
