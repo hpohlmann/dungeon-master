@@ -1,6 +1,6 @@
 # Makefile for Dungeon Master development
 
-.PHONY: help install install-dev clean test lint format type-check build publish
+.PHONY: help install install-dev clean test lint format type-check build check-dist publish-test publish release
 
 # Default target
 help:
@@ -14,7 +14,10 @@ help:
 	@echo "  format      - Format code with black and isort"
 	@echo "  type-check  - Run mypy type checking"
 	@echo "  build       - Build the package"
+	@echo "  check-dist  - Check package distribution"
+	@echo "  publish-test- Publish to Test PyPI"
 	@echo "  publish     - Publish to PyPI (requires authentication)"
+	@echo "  release     - Prepare release (clean, build, check)"
 
 # Installation targets
 install:
@@ -55,8 +58,19 @@ type-check:
 build:
 	python -m build
 
-publish: build
+check-dist: build
+	twine check dist/*
+
+publish-test: build check-dist
+	twine upload --repository testpypi dist/*
+
+publish: build check-dist
 	twine upload dist/*
+
+release: clean build check-dist
+	@echo "Building release for cursor-dungeon-master..."
+	@echo "Version: $(shell grep version pyproject.toml | head -1 | sed 's/.*= *"\(.*\)".*/\1/')"
+	@echo "Ready to publish to PyPI. Run 'make publish' to proceed."
 
 # Development setup
 dev-setup: install-dev
