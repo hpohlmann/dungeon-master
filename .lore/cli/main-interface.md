@@ -72,8 +72,8 @@ flowchart TD
     G --> I
     H --> I
 
-    I -->|Yes| J[sys.exit(0)]
-    I -->|No| K[sys.exit(1)]
+    I -->|Yes| J[sys.exit 0]
+    I -->|No| K[sys.exit 1]
 ```
 
 ## Notes
