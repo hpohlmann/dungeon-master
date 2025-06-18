@@ -7,4 +7,4 @@ file operations, and output formatting.
 
 # Utility modules will be imported as needed to avoid circular imports
 
-__all__ = ["config", "file_utils", "output"]
+__all__ = ["config", "file_utils", "output", "cursor_setup"]
