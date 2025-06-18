@@ -1,6 +1,6 @@
 # Dungeon Master Documentation
 
-**Dungeon Master** is a lightweight pre-commit hook system designed to enforce documentation updates alongside code changes. It ensures your codebase documentation stays current by blocking commits when documentation is missing or outdated.
+**Dungeon Master** is a lightweight pre-commit hook system designed to enforce documentation updates alongside code changes, with first-class integration for Cursor IDE. It ensures your codebase documentation stays current by blocking commits when documentation is missing or outdated.
 
 ## 🎯 What Dungeon Master Does
 
@@ -8,21 +8,33 @@
 - **Template-Driven**: Provides structured documentation templates with required sections
 - **File Tracking**: Uses simple decorators (`track_lore`) to link source files to documentation
 - **Rich CLI**: Beautiful terminal output with clear status indicators and actionable instructions
-- **IDE Integration**: Includes Cursor IDE rules for seamless development workflow
+- **Cursor IDE Integration**: Includes specialized Cursor IDE rules for seamless AI-assisted development workflow
+
+## 🎯 Why Cursor-Specific?
+
+This tool is specifically designed for Cursor IDE users who want to:
+
+- **Leverage AI context**: Documentation is structured to provide rich context for Cursor's AI features
+- **Maintain code quality**: Pre-commit hooks ensure documentation stays current with AI-assisted development
+- **Streamline workflow**: Cursor rules help the AI understand your documentation standards
+- **Scale with teams**: Consistent documentation practices across AI-assisted development teams
 
 ## 🚀 Quick Start
 
 1. **Install Dungeon Master**
+
    ```bash
-   pip install dungeon-master
+   pip install cursor-dungeon-master
    ```
 
 2. **Initialize in your project**
+
    ```bash
    dm init
    ```
 
 3. **Add tracking decorators to your code**
+
    ```python
    # track_lore("payments.md")
    def process_payment():
@@ -30,6 +42,7 @@
    ```
 
 4. **Create documentation files**
+
    ```bash
    dm create_lore
    ```
@@ -63,7 +76,9 @@ docs/
 ## 🔗 Key Concepts
 
 ### Track Lore Decorators
+
 Mark files that need documentation tracking:
+
 ```python
 # track_lore("api/payments.md")          # Simple reference
 # track_lore("platform/auth/login.md")   # Nested structure
@@ -72,7 +87,9 @@ def authenticate_user():
 ```
 
 ### Documentation Directory
+
 All documentation lives in the `.lore/` directory:
+
 ```
 .lore/
 ├── api/
@@ -84,7 +101,9 @@ All documentation lives in the `.lore/` directory:
 ```
 
 ### Pre-commit Protection
+
 When you modify tracked files, commits are blocked until documentation is updated:
+
 ```bash
 ❌ VALIDATION FAILED
 REQUIRED ACTIONS:
@@ -94,13 +113,13 @@ REQUIRED ACTIONS:
 
 ## 🎯 Core Commands
 
-| Command | Purpose |
-|---------|---------|
-| `dm init` | Initialize Dungeon Master in your repository |
-| `dm validate` | Check documentation status (used by pre-commit hook) |
-| `dm review` | Display rich documentation status and required actions |
-| `dm create_lore` | Generate documentation templates for tracked files |
-| `dm map` | Create visual repository structure showing tracked files |
+| Command          | Purpose                                                  |
+| ---------------- | -------------------------------------------------------- |
+| `dm init`        | Initialize Dungeon Master in your repository             |
+| `dm validate`    | Check documentation status (used by pre-commit hook)     |
+| `dm review`      | Display rich documentation status and required actions   |
+| `dm create_lore` | Generate documentation templates for tracked files       |
+| `dm map`         | Create visual repository structure showing tracked files |
 
 ## 🏗️ Documentation Requirements
 
@@ -140,6 +159,7 @@ Dungeon Master operates on these principles:
 ## 🔧 Language Support
 
 Currently supported:
+
 - **Python**: `# track_lore("path/to/doc.md")`
 - **TypeScript/JavaScript**: `// track_lore("path/to/doc.md")`
 

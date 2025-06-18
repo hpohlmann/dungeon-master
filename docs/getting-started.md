@@ -1,6 +1,6 @@
 # Getting Started with Dungeon Master
 
-This guide will walk you through setting up Dungeon Master in your project and using it for the first time. By the end, you'll have a fully configured documentation enforcement system.
+This guide will walk you through setting up Dungeon Master in your project and using it for the first time. By the end, you'll have a fully configured documentation enforcement system with Cursor IDE integration for AI-assisted development.
 
 ## 📋 Prerequisites
 
@@ -10,19 +10,14 @@ This guide will walk you through setting up Dungeon Master in your project and u
 
 ## 🚀 Installation
 
-### Option 1: Install via pip (recommended)
-```bash
-pip install dungeon-master
-```
+### Install via pip
 
-### Option 2: Install from source
 ```bash
-git clone https://github.com/your-org/dungeon-master
-cd dungeon-master
-pip install -e .
+pip install cursor-dungeon-master
 ```
 
 ### Verify Installation
+
 ```bash
 dm --help
 ```
@@ -34,18 +29,23 @@ You should see the Dungeon Master CLI help menu.
 ### Step 1: Initialize Dungeon Master
 
 Navigate to your project root and run:
+
 ```bash
 dm init
 ```
 
 This will create:
+
 - `.lore/` directory for documentation
-- `.cursor/rules/` directory with IDE integration rules
+- `.cursor/rules/` directory with Cursor IDE integration rules
 - `dmconfig.json` configuration file
 - `dmcache.json` state tracking (auto-gitignored)
 - Pre-commit hook setup
 
+**Cursor IDE Integration**: The `.cursor/rules/` directory contains specialized rules that help Cursor's AI understand your documentation workflow and provide better code suggestions that align with your documentation standards.
+
 **Expected Output:**
+
 ```
 ✨ Initializing Dungeon Master ✨
 
@@ -72,6 +72,7 @@ Initialization complete! Your project is now protected by Dungeon Master.
 ### Step 2: Examine Your Project Structure
 
 After initialization, your project will have:
+
 ```
 your-project/
 ├── .lore/                    # Documentation directory
@@ -89,6 +90,7 @@ your-project/
 Choose important files in your codebase to start tracking. Add decorators at the top:
 
 **Python Example:**
+
 ```python
 # track_lore("api/payment_processing.md")
 # track_lore("core/business_logic.md")
@@ -99,17 +101,19 @@ class PaymentProcessor:
 ```
 
 **TypeScript Example:**
+
 ```typescript
 // track_lore("frontend/user_authentication.md")
 // track_lore("api/auth_middleware.md")
 export class AuthService {
-    authenticate(credentials: UserCredentials): Promise<AuthResult> {
-        // Authentication logic
-    }
+  authenticate(credentials: UserCredentials): Promise<AuthResult> {
+    // Authentication logic
+  }
 }
 ```
 
 **Important Guidelines:**
+
 - Use descriptive paths that reflect the component's purpose
 - Multiple files can reference the same documentation
 - Paths are relative to `.lore/` directory
@@ -118,11 +122,13 @@ export class AuthService {
 ### Step 4: Generate Documentation Templates
 
 Create documentation files for all your tracked decorators:
+
 ```bash
 dm create_lore
 ```
 
 **Expected Output:**
+
 ```
 🔮 Creating Lore Files 🔮
 
@@ -154,40 +160,53 @@ dm create_lore
 
 Open one of the generated files (e.g., `.lore/api/payment_processing.md`):
 
-```markdown
+````markdown
 # Documentation for payment_processing.md
 
 ## Overview
+
 <!-- REQUIRED: Provide a brief overview of what this file does and its purpose -->
+
 [PLEASE FILL OUT: Overview]
 
 ## Dependencies
+
 <!-- List any important dependencies or related components -->
+
 [PLEASE FILL OUT: Dependencies]
 
 ## Key Functions/Components
+
 <!-- REQUIRED: Document the main functions, classes, or features -->
+
 [PLEASE FILL OUT: Functions/Components]
 
 ## Usage Examples
+
 <!-- Provide examples of how to use this code -->
+
 [PLEASE FILL OUT: Examples]
 
 ## Diagrams
+
 <!-- REQUIRED: Include professional diagrams -->
+
 ### Sequence Diagram
+
 ```mermaid
 sequenceDiagram
     participant User
     participant Component
     participant Service
-    
+
     User->>Component: Action
     Component->>Service: Request
     Service-->>Component: Response
     Component-->>User: Result
 ```
-```
+````
+
+````
 
 **Replace the placeholders** with actual content:
 
@@ -235,11 +254,12 @@ refund_result = processor.handle_refund(
     transaction_id='txn_12345',
     amount=50.00
 )
-```
+````
 
 ## Diagrams
 
 ### Payment Processing Flow
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -247,11 +267,11 @@ sequenceDiagram
     participant Stripe
     participant Database
     participant FraudDetection
-    
+
     Client->>PaymentProcessor: process_payment(amount, method)
     PaymentProcessor->>FraudDetection: validate_transaction(details)
     FraudDetection-->>PaymentProcessor: validation_result
-    
+
     alt Fraud detected
         PaymentProcessor-->>Client: fraud_error
     else Valid transaction
@@ -263,13 +283,14 @@ sequenceDiagram
 ```
 
 ### Component Architecture
+
 ```mermaid
 flowchart TD
     A[PaymentProcessor] --> B[StripeAdapter]
     A --> C[FraudDetectionService]
     A --> D[TransactionLogger]
     A --> E[RetryManager]
-    
+
     B --> F[Stripe API]
     C --> G[Fraud Detection API]
     D --> H[PostgreSQL]
@@ -279,29 +300,31 @@ flowchart TD
 ---
 
 _This documentation is linked to src/payment/processor.py, src/payment/models.py_
-```
+
+````
 
 ### Step 6: Check Documentation Status
 
 Review what needs attention:
 ```bash
 dm review
-```
+````
 
 **Expected Output:**
+
 ```
 🔍 Documentation Review 🔍
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━┓
-┃ Lore File                      ┃ Tracked Files                              ┃ Status              ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━┩
-│ .lore/api/payment_processing.md│ src/payment/processor.py                   │ UP TO DATE         │
-│                               │ src/payment/models.py                      │                      │
-├───────────────────────────────┼────────────────────────────────────────────────┼──────────────────────────┤
-│ .lore/core/business_logic.md  │ src/business/rules.py                      │ TEMPLATE ONLY      │
-├───────────────────────────────┼────────────────────────────────────────────────┼──────────────────────────┤
-│ .lore/frontend/user_auth.md   │ src/frontend/auth.ts                       │ TEMPLATE ONLY      │
-└───────────────────────────────┴────────────────────────────────────────────────┴──────────────────────────┘
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Lore File                      ┃ Tracked Files                              ┃ Status               ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━┩
+│ .lore/api/payment_processing.md│ src/payment/processor.py                   │ UP TO DATE           │
+│                                │ src/payment/models.py                      │                      │
+├────────────────────────────────┼────────────────────────────────────────────┼──────────────────────┤
+│ .lore/core/business_logic.md   │ src/business/rules.py                      │ TEMPLATE ONLY        │
+├────────────────────────────────┼────────────────────────────────────────────┼──────────────────────┤
+│ .lore/frontend/user_auth.md    │ src/frontend/auth.ts                       │ TEMPLATE ONLY        │
+└────────────────────────────────┴────────────────────────────────────────────┴──────────────────────┘
 
 ❗ REQUIRED ACTIONS:
   → COMPLETE .lore/core/business_logic.md TEMPLATE WITH ACTUAL DOCUMENTATION
@@ -313,24 +336,27 @@ dm review
 ### Step 7: Test Pre-commit Protection
 
 1. **Make a change to a tracked file:**
+
    ```bash
    echo "# New function added" >> src/payment/processor.py
    git add src/payment/processor.py
    ```
 
 2. **Try to commit without updating documentation:**
+
    ```bash
    git commit -m "Add new payment feature"
    ```
 
 3. **See the protection in action:**
+
    ```
    🔒 Validating Documentation 🔒
-   
+
    ❌ VALIDATION FAILED
    REQUIRED ACTIONS:
      1. UPDATE .lore/api/payment_processing.md TO REFLECT CHANGES IN src/payment/processor.py
-   
+
    🛑 COMMIT BLOCKED: UPDATE DOCUMENTATION BEFORE PROCEEDING
    ```
 
@@ -344,22 +370,26 @@ dm review
 ## 🎯 Best Practices for Your First Week
 
 ### Start Small
+
 - Begin with 3-5 critical files
 - Choose files that change frequently
 - Focus on business logic and API endpoints
 
 ### Documentation Quality
+
 - Be specific, not generic
 - Include actual code examples
 - Update diagrams when architecture changes
 - Write for new team members
 
 ### Team Adoption
+
 - Share the workflow guide with teammates
 - Review documentation during code reviews
 - Treat documentation as part of "definition of done"
 
 ### Common Pitfalls to Avoid
+
 - Don't leave placeholder text in templates
 - Don't use generic or high-level diagrams
 - Don't bypass validation with `--no-verify`
@@ -370,10 +400,12 @@ dm review
 Once you're comfortable with basic usage:
 
 1. **Explore Advanced Features**
+
    - Check out [Configuration Options](configuration.md)
    - Learn about [Team Workflow Strategies](examples/team-workflow/)
 
 2. **Integrate with Your Tools**
+
    - Set up CI/CD validation
    - Configure IDE shortcuts
    - Create team documentation standards
