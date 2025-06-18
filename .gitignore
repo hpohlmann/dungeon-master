@@ -62,9 +62,6 @@ ENV/
 *.swp
 *.swo
 
-# Dungeon Master specific
-dmcache.json
-
 # OS specific
 .DS_Store
 Thumbs.db
@@ -193,8 +190,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Dungeon Master cache file
-dmcache.json
+# Dungeon Master cache files - NEVER COMMIT THESE
+.dmcache.json
+.dmconfig.json.bak
 
 # Dungeon Master test environment
 .lore.dev/ 
