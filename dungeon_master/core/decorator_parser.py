@@ -213,31 +213,45 @@ def scan_repository_for_lore_decorators(
         
     lore_mapping: Dict[str, List[str]] = {}
     
-    # If include_patterns is specified, use those; otherwise use default extensions
-    if include_patterns:
-        file_paths = []
-        for pattern in include_patterns:
-            file_paths.extend(repo_path.glob(pattern))
-    else:
-        # Scan for all supported file types
-        file_paths = []
-        for ext in ALL_SUPPORTED_EXTENSIONS:
-            file_paths.extend(repo_path.glob(f'**/*{ext}'))
+    # Use custom directory walker that respects exclusions from the start
+    # This avoids the performance issue of globbing through virtual environments
+    def walk_directory(current_path: Path) -> List[Path]:
+        """Walk directory tree, skipping excluded directories."""
+        files = []
+        
+        try:
+            for item in current_path.iterdir():
+                if item.is_dir():
+                    # Skip excluded directories entirely - don't even recurse into them
+                    if should_skip_directory(item, excluded_directories):
+                        continue
+                    # Recursively walk non-excluded directories
+                    files.extend(walk_directory(item))
+                elif item.is_file():
+                    # Only include supported file types (unless custom include_patterns)
+                    if include_patterns:
+                        # If custom patterns, check against them
+                        if any(item.match(pattern) for pattern in include_patterns):
+                            files.append(item)
+                    else:
+                        # Default: only supported extensions
+                        if is_supported_file(item):
+                            files.append(item)
+        except (PermissionError, OSError):
+            # Skip directories we can't read
+            pass
+            
+        return files
+    
+    # Get all files using our custom walker (no more glob performance issues!)
+    file_paths = walk_directory(repo_path)
     
     for file_path in file_paths:
-        # Skip files in directories we should ignore
-        if any(should_skip_directory(parent, excluded_directories) for parent in file_path.parents):
-            continue
-            
-        # Skip files that match exclude patterns
+        # Apply additional exclude patterns if specified
         if exclude_patterns:
             if any(file_path.match(pattern) for pattern in exclude_patterns):
                 continue
         
-        # Only process supported file types (unless custom include_patterns)
-        if not include_patterns and not is_supported_file(file_path):
-            continue
-            
         # Extract lore paths from this file
         lore_paths = extract_lore_paths_safe(file_path)
         
