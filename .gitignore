@@ -192,7 +192,11 @@ dmypy.json
 
 # Dungeon Master cache files - NEVER COMMIT THESE
 .dmcache.json
+.dmcache.tmp
+dmcache.json
 .dmconfig.json.bak
+*/.dmcache.json
+*/.dmcache.tmp
 
 # Dungeon Master test environment
 .lore.dev/ 
