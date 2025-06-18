@@ -1,0 +1,133 @@
+{
+	"meta": {
+		"generatedAt": "2025-06-18T15:46:49.810Z",
+		"tasksAnalyzed": 15,
+		"totalTasks": 15,
+		"analysisCount": 15,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": false
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "Project Initialization and Directory Structure Setup",
+			"complexityScore": 3,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down the project initialization task into subtasks covering directory creation, file generation, and git integration. For each subtask, provide detailed implementation steps and error handling considerations.",
+			"reasoning": "This task involves basic file system operations and simple JSON handling. The code is already well-structured with clear requirements. The complexity is low as it primarily involves creating directories and files with minimal logic."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "CLI Framework Implementation",
+			"complexityScore": 4,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Divide the CLI framework implementation into subtasks covering command registration, help text configuration, and package structure setup. For each subtask, detail the implementation approach and testing strategy.",
+			"reasoning": "Setting up a CLI framework with Click is straightforward, but requires careful organization of commands and options. The task involves multiple commands with different parameters and proper package structure setup, adding moderate complexity."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Lore Decorator Parser Implementation",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down the lore decorator parser implementation into subtasks covering regex pattern development, file type handling, repository scanning, and error handling. For each subtask, provide detailed implementation steps and test cases.",
+			"reasoning": "This task involves complex regex patterns, handling multiple file types, and scanning an entire repository structure. Error handling for various file formats and potential parsing issues adds significant complexity."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Lore File Template System",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Divide the lore file template system into subtasks covering template definition, placeholder replacement logic, and file creation with proper directory handling. For each subtask, detail the implementation approach and edge cases to consider.",
+			"reasoning": "Creating a template system involves string manipulation, file path handling, and directory creation. The complexity comes from properly handling placeholders and ensuring the template structure is maintained across different file types."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "Repository Mapping Functionality",
+			"complexityScore": 7,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down the repository mapping functionality into subtasks covering file scanning, tree structure generation, relationship mapping, and output formatting. For each subtask, provide detailed implementation steps and visualization considerations.",
+			"reasoning": "This task requires building a complex tree structure representing the repository, handling file relationships, and generating both console and markdown output. The visualization aspects and relationship mapping add significant complexity."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "Documentation Review System",
+			"complexityScore": 8,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide the documentation review system into subtasks covering status checking, change detection, template validation, manual override functionality, and output formatting. For each subtask, detail the implementation approach and user experience considerations.",
+			"reasoning": "This task involves multiple complex operations: checking file status, detecting changes, validating templates, and providing manual overrides. The rich output formatting and detailed user feedback requirements add significant complexity."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "Lore File Creation System",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down the lore file creation system into subtasks covering decorator scanning, directory structure creation, and template population. For each subtask, provide detailed implementation steps and error handling considerations.",
+			"reasoning": "Creating lore files requires scanning for decorators, creating directory structures, and populating templates. The complexity is moderate as it builds on existing functionality but requires careful handling of file paths and template content."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Documentation Validation System",
+			"complexityScore": 9,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Divide the documentation validation system into subtasks covering file existence checking, change detection, template validation, diagram validation, error reporting, and pre-commit hook integration. For each subtask, detail the implementation approach and validation criteria.",
+			"reasoning": "This is one of the most complex tasks as it combines multiple validation steps, integrates with git, and must provide detailed error messages. The validation logic is sophisticated, requiring checks for template content, diagrams, and file relationships."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "Git Pre-commit Hook Integration",
+			"complexityScore": 4,
+			"recommendedSubtasks": 2,
+			"expansionPrompt": "Break down the git pre-commit hook integration into subtasks covering hook script creation and installation process. For each subtask, provide detailed implementation steps and platform-specific considerations.",
+			"reasoning": "Integrating with git hooks is relatively straightforward but requires careful handling of file permissions and platform-specific considerations. The complexity is moderate as it involves shell script generation and making files executable."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "Cursor Rules Integration",
+			"complexityScore": 3,
+			"recommendedSubtasks": 2,
+			"expansionPrompt": "Divide the Cursor rules integration into subtasks covering template file management and installation process. For each subtask, detail the implementation approach and error handling considerations.",
+			"reasoning": "This task primarily involves file copying operations with minimal logic. The complexity is low as it's mainly about copying pre-created files to a specific directory with basic error handling."
+		},
+		{
+			"taskId": 11,
+			"taskTitle": "Template Detection Logic",
+			"complexityScore": 7,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down the template detection logic into subtasks covering placeholder detection, diagram validation, section content analysis, and comprehensive validation rules. For each subtask, provide detailed implementation steps and test cases.",
+			"reasoning": "This task requires sophisticated content analysis using regex and string manipulation. The complexity comes from detecting various template elements, validating diagram content, and analyzing section completeness with multiple criteria."
+		},
+		{
+			"taskId": 12,
+			"taskTitle": "Rich Formatting for Console Output",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Divide the rich formatting implementation into subtasks covering theme definition, component styling, and integration with existing commands. For each subtask, detail the implementation approach and visual design considerations.",
+			"reasoning": "Implementing rich formatting requires consistent styling across multiple output types (tables, trees, text). The complexity is moderate as it involves designing a cohesive visual style and integrating it throughout the application."
+		},
+		{
+			"taskId": 13,
+			"taskTitle": "Configuration System",
+			"complexityScore": 4,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down the configuration system into subtasks covering default configuration, user configuration loading, and configuration application. For each subtask, provide detailed implementation steps and validation considerations.",
+			"reasoning": "The configuration system involves JSON handling and merging default values with user-provided ones. The complexity is moderate as it requires careful handling of configuration options and graceful error handling."
+		},
+		{
+			"taskId": 14,
+			"taskTitle": "State Tracking System",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide the state tracking system into subtasks covering cache structure, file review tracking, validation timing, and file change detection. For each subtask, detail the implementation approach and persistence considerations.",
+			"reasoning": "The state tracking system requires sophisticated file hashing, timestamp management, and persistent storage. The complexity comes from reliably detecting file changes and maintaining state across command executions."
+		},
+		{
+			"taskId": 15,
+			"taskTitle": "Package Distribution Setup",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down the package distribution setup into subtasks covering setup.py configuration, documentation preparation, and manifest file creation. For each subtask, provide detailed implementation steps and packaging best practices.",
+			"reasoning": "Setting up a Python package for distribution involves multiple configuration files and careful handling of non-Python assets. The complexity is moderate as it requires knowledge of Python packaging standards and proper dependency management."
+		}
+	]
+}
