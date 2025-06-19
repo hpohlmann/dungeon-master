@@ -14,8 +14,7 @@ Generated on: dm
 ├── 📁 utils/
 │   ├── 📄 config.py *[tracked by core/configuration.md]*
 │   ├── 📄 cursor_setup.py *[tracked by integrations/cursor.md]*
-│   ├── 📄 file_utils.py *[tracked by utils/utilities.md]*
-│   └── 📄 output.py *[tracked by utils/utilities.md]*
+│   └── 📄 file_utils.py *[tracked by utils/utilities.md]*
 ├── 📄 cli.py *[tracked by cli/main-interface.md]*
 ├── 📁 hooks/
 │   └── 📄 pre_commit.py *[tracked by integrations/git-hooks.md]*
@@ -24,7 +23,7 @@ Generated on: dm
     ├── 📄 map.py *[tracked by commands/cli-system.md]*
     ├── 📄 validate.py *[tracked by commands/cli-system.md]*
     ├── 📄 create_lore.py *[tracked by commands/cli-system.md]*
-    └── 📄 init.py *[tracked by commands/cli-system.md]*
+    └── 📄 init.py *[tracked by commands/cli-system.md, filename.md]*
 📁 .lore/
 ├── 📁 core/
 │   ├── 📋 engine.md *[tracks dungeon_master/core/decorator_parser.py, dungeon_master/core/template.py, dungeon_master/core/git_utils.py, dungeon_master/core/validation.py]*
@@ -33,11 +32,12 @@ Generated on: dm
 │   ├── 📋 cursor.md *[tracks dungeon_master/utils/cursor_setup.py]*
 │   └── 📋 git-hooks.md *[tracks dungeon_master/hooks/pre_commit.py]*
 ├── 📁 utils/
-│   └── 📋 utilities.md *[tracks dungeon_master/utils/file_utils.py, dungeon_master/utils/output.py]*
+│   └── 📋 utilities.md *[tracks dungeon_master/utils/file_utils.py]*
 ├── 📁 cli/
 │   └── 📋 main-interface.md *[tracks dungeon_master/cli.py]*
-└── 📁 commands/
-    └── 📋 cli-system.md *[tracks dungeon_master/commands/review.py, dungeon_master/commands/map.py, dungeon_master/commands/validate.py, dungeon_master/commands/create_lore.py, dungeon_master/commands/init.py]*
+├── 📁 commands/
+│   └── 📋 cli-system.md *[tracks dungeon_master/commands/review.py, dungeon_master/commands/map.py, dungeon_master/commands/validate.py, dungeon_master/commands/create_lore.py, dungeon_master/commands/init.py]*
+└── 📋 filename.md *[tracks dungeon_master/commands/init.py]*
 ```
 
 ## Documentation Coverage
@@ -58,7 +58,6 @@ Generated on: dm
 
 - **utils/utilities.md**
   - `dungeon_master/utils/file_utils.py`
-  - `dungeon_master/utils/output.py`
 
 - **cli/main-interface.md**
   - `dungeon_master/cli.py`
@@ -71,6 +70,9 @@ Generated on: dm
   - `dungeon_master/commands/map.py`
   - `dungeon_master/commands/validate.py`
   - `dungeon_master/commands/create_lore.py`
+  - `dungeon_master/commands/init.py`
+
+- **filename.md**
   - `dungeon_master/commands/init.py`
 
 ## Legend

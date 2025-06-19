@@ -200,3 +200,25 @@ dmcache.json
 
 # Dungeon Master test environment
 .lore.dev/ 
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+ENV/
+env.bak/
+venv.bak/
+
+# Python virtual environment files
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+
+# Dungeon Master cache files (project root only)
+dmcache.json
+.dmconfig.json.bak 

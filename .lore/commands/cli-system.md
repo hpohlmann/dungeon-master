@@ -41,9 +41,18 @@ The CLI commands are built using Click framework with rich console output, provi
 #### Initialize Command (`init.py`)
 
 - `run_init()` - Sets up Dungeon Master in a repository
+- `cleanup_lore_cache_files()` - Removes any cache files from .lore directory to ensure single cache file in project root
+- `create_config_files()` - Creates dmconfig.json and dmcache.json with enhanced cache file placement
+- `update_gitignore()` - Uses comprehensive template with virtual environment patterns
 - Creates `.lore` directory structure
 - Installs Cursor rules and configuration files
 - Sets up git pre-commit hook
+
+**Recent Improvements:**
+
+- **Cache File Management**: Ensures only one cache file exists in project root, never in .lore directory to prevent AI context token consumption
+- **Enhanced Gitignore**: Uses comprehensive template including virtual environments, Python cache files, and Dungeon Master patterns
+- **Automatic Cleanup**: Removes any existing cache files from .lore directory during initialization
 
 #### Validation Command (`validate.py`)
 

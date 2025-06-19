@@ -90,6 +90,11 @@ flowchart TD
 - Command grouping and organization
 - Option parsing and validation
 
+**Recent Improvements:**
+
+- **Fixed Version Detection**: Added proper version detection using `importlib.metadata` with fallback for development environments
+- **Robust Package Detection**: Version command now works correctly for both pip-installed and development setups
+
 ---
 
 _This documentation is linked to dungeon_master/cli.py_

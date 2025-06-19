@@ -20,10 +20,17 @@ The utilities modules provide essential supporting functionality for Dungeon Mas
 
 ### File Utilities (`file_utils.py`)
 
+- `get_gitignore_template()` - Loads comprehensive gitignore template from package templates
+- `ensure_directory()` - Creates directories with proper error handling
 - File system operations and path handling
 - Directory creation and validation
 - File content manipulation
 - Path resolution and normalization
+
+**Recent Additions:**
+
+- **Gitignore Template Loading**: New function to load enhanced gitignore patterns including virtual environments, Python cache files, and Dungeon Master files
+- **Package Template Integration**: Template loading works correctly for both development and pip-installed distributions
 
 ### Output Utilities (`output.py`)
 

@@ -18,6 +18,42 @@ from dungeon_master.utils.cursor_setup import setup_cursor_rules
 console = Console()
 
 
+def cleanup_lore_cache_files() -> bool:
+    """
+    Remove any cache files that might exist in the .lore directory.
+    
+    This ensures only one cache file exists in the project root,
+    preventing token consumption from large cache files in AI context.
+    
+    Returns:
+        True if cleanup completed successfully, False on error
+    """
+    try:
+        lore_dir = Path(".lore")
+        if not lore_dir.exists():
+            return True
+            
+        # Find and remove any cache files in .lore directory
+        cache_patterns = ["dmcache.json", ".dmcache.json", ".dmcache.tmp"]
+        removed_files = []
+        
+        for pattern in cache_patterns:
+            for cache_file in lore_dir.rglob(pattern):
+                try:
+                    cache_file.unlink()
+                    removed_files.append(str(cache_file))
+                except OSError:
+                    pass  # File might not exist or no permissions
+        
+        if removed_files:
+            console.print(f"  🧹 Cleaned up cache files from .lore directory: {', '.join(removed_files)}")
+        
+        return True
+    except Exception as e:
+        console.print(f"  ⚠️ [yellow]Warning: Could not clean .lore cache files: {e}[/yellow]")
+        return True  # Don't fail init for cleanup issues
+
+
 def create_lore_directory() -> bool:
     """
     Create the .lore directory if it doesn't exist.
@@ -39,6 +75,9 @@ def create_lore_directory() -> bool:
 def create_config_files() -> bool:
     """
     Create dmconfig.json and dmcache.json configuration files.
+    
+    Both files are always created in the current working directory (project root).
+    The cache file should never be created in subdirectories like .lore/.
 
     Returns:
         True if files were created successfully, False on error
@@ -51,16 +90,18 @@ def create_config_files() -> bool:
             console.print(f"  ❌ [red]Failed to create dmconfig.json[/red]")
             return False
 
-        # Create empty dmcache.json
+        # Create empty dmcache.json - ALWAYS in project root, never in subdirectories
         cache_content = """{
   "lastValidation": null,
   "reviewedFiles": {},
   "templateFiles": {}
 }"""
 
-        with open("dmcache.json", "w") as f:
+        # Explicitly create in current directory (where dm init is run from)
+        cache_path = "dmcache.json"
+        with open(cache_path, "w") as f:
             f.write(cache_content)
-        console.print(f"  ✅ Created [cyan]dmcache.json[/cyan]")
+        console.print(f"  ✅ Created [cyan]dmcache.json[/cyan] (single cache file in project root)")
 
         return True
     except OSError as e:
@@ -70,33 +111,60 @@ def create_config_files() -> bool:
 
 def update_gitignore() -> bool:
     """
-    Update .gitignore to exclude dmcache.json.
+    Update .gitignore with comprehensive patterns including virtual environments.
 
     Returns:
         True if .gitignore was updated successfully, False on error
     """
     try:
+        from dungeon_master.utils.file_utils import get_gitignore_template
+        
         gitignore_path = Path(".gitignore")
+        
+        # Get the template content
+        try:
+            template_content = get_gitignore_template()
+        except FileNotFoundError as e:
+            console.print(f"  ❌ [red]Error loading gitignore template: {e}[/red]")
+            return False
 
         # Read existing .gitignore if it exists
         existing_content = ""
         if gitignore_path.exists():
-            existing_content = gitignore_path.read_text()
+            existing_content = gitignore_path.read_text(encoding="utf-8")
 
-        # Check if dmcache.json is already ignored
-        if "dmcache.json" not in existing_content:
-            # Add dmcache.json to .gitignore
-            with open(".gitignore", "a") as f:
+        # Split template into lines for checking
+        template_lines = template_content.strip().split("\n")
+        existing_lines = existing_content.strip().split("\n") if existing_content else []
+        
+        # Find lines that need to be added
+        lines_to_add = []
+        for line in template_lines:
+            # Skip empty lines and comments for duplicate checking
+            line_stripped = line.strip()
+            if not line_stripped or line_stripped.startswith("#"):
+                continue
+                
+            # Check if this pattern is already in .gitignore
+            if line_stripped not in existing_content:
+                lines_to_add.append(line_stripped)
+
+        if lines_to_add:
+            # Add missing patterns to .gitignore
+            with open(".gitignore", "a", encoding="utf-8") as f:
                 if existing_content and not existing_content.endswith("\n"):
                     f.write("\n")
-                f.write("\n# Dungeon Master cache file\ndmcache.json\n")
+                f.write("\n")
+                f.write(template_content)
+                f.write("\n")
 
+            patterns_summary = ["virtual environments", "Python cache files", "Dungeon Master files"]
             console.print(
-                f"  ✅ Updated [cyan].gitignore[/cyan] to exclude [cyan]dmcache.json[/cyan]"
+                f"  ✅ Updated [cyan].gitignore[/cyan] with {len(lines_to_add)} new patterns ({', '.join(patterns_summary)})"
             )
         else:
             console.print(
-                f"  ✅ [cyan].gitignore[/cyan] already excludes [cyan]dmcache.json[/cyan]"
+                f"  ✅ [cyan].gitignore[/cyan] already contains all necessary patterns"
             )
 
         return True
@@ -174,6 +242,9 @@ def run_init() -> bool:
     console.print("📁 Creating directory structure...")
     success &= create_lore_directory()
 
+    # Clean up any cache files in .lore directory (ensures single cache file in root)
+    cleanup_lore_cache_files()
+
     # Set up Cursor rules
     console.print()
     try:
@@ -208,7 +279,7 @@ def run_init() -> bool:
         console.print()
         console.print("📚 [bold]Next steps:[/bold]")
         console.print(
-            '  1. Add [cyan]# track_lore("filename.md")[/cyan] decorators to your code files'
+            '  1. Add [cyan]# track_lore("path/filename.md")[/cyan] decorators to your code files'
         )
         console.print(
             "  2. Run [cyan]dm create-lore[/cyan] to generate documentation templates"
