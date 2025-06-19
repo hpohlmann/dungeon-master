@@ -1,7 +1,0 @@
-# Dungeon Master cache files
-.dmcache.json
-.dmcache.tmp
-dmcache.json
-.dmconfig.json.bak
-*/.dmcache.json
-*/.dmcache.tmp 

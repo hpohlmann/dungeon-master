@@ -45,11 +45,7 @@
   "preCommitEnabled": true,
   "preCommitScript": "dm validate",
   "requireDiagrams": true,
-  "requiredSections": [
-    "Overview",
-    "Functions/Components",
-    "Diagrams"
-  ],
+  "requiredSections": ["Overview", "Functions/Components", "Diagrams"],
   "showProgressBars": true,
   "validateDiagramContent": true,
   "validateOnCommit": true,

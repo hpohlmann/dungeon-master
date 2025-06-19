@@ -12,11 +12,11 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 # Regex patterns for track_lore decorators
-# Python: Matches comments with the track_lore function call syntax
-PY_PATTERN = r'#\s*track_lore\(\s*["\']([^"\']+)["\']\s*\)'
+# Python: Matches comments at start of line with the track_lore function call syntax
+PY_PATTERN = r'^\s*#\s*track_lore\(\s*["\']([^"\']+)["\']\s*\)'
 
-# TypeScript/JavaScript: Matches comments with the track_lore function call syntax
-TS_PATTERN = r'//\s*track_lore\(\s*["\']([^"\']+)["\']\s*\)'
+# TypeScript/JavaScript: Matches comments at start of line with the track_lore function call syntax
+TS_PATTERN = r'^\s*//\s*track_lore\(\s*["\']([^"\']+)["\']\s*\)'
 
 # Supported file extensions
 PYTHON_EXTENSIONS = {".py", ".pyx", ".pyi"}

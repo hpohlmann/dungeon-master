@@ -40,6 +40,11 @@ This engine enables automatic discovery of `track_lore` decorators in source cod
 - `is_supported_file()` - Determines if file type supports decorators (Python, TypeScript)
 - `should_skip_directory()` - Implements directory exclusion logic for performance
 
+**Recent Improvements:**
+
+- **Enhanced Regex Patterns**: Fixed decorator detection to only match actual comments at start of lines, preventing false positives from string literals or inline examples
+- **Strict Pattern Matching**: Updated regex to use `^` anchors ensuring decorators are only detected in proper comment context
+
 ### Template System (`template.py`)
 
 - `create_lore_file()` - Creates individual documentation files with templates

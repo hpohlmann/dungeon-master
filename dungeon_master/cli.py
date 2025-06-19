@@ -15,9 +15,16 @@ from rich.console import Console
 # Initialize rich console for formatted output
 console = Console()
 
+# Get version information
+try:
+    import importlib.metadata
+    __version__ = importlib.metadata.version("cursor-dungeon-master")
+except importlib.metadata.PackageNotFoundError:
+    __version__ = "unknown"
+
 
 @click.group()
-@click.version_option()
+@click.version_option(version=__version__)
 def main():
     """
     Dungeon Master - Documentation enforcement system.
