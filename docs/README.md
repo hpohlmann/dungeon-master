@@ -62,15 +62,7 @@ Your commits will now be protected - if you modify tracked files without updatin
 docs/
 ├── README.md              # This file - overview and quick start
 ├── getting-started.md     # Detailed setup and first steps
-├── commands.md           # Complete CLI command reference
-├── workflow.md           # Development workflow and best practices
-├── templates.md          # Documentation template guide
-├── configuration.md      # Configuration options and customization
-├── troubleshooting.md    # Common issues and solutions
-└── examples/             # Practical examples and use cases
-    ├── python-project/   # Example Python project setup
-    ├── typescript-project/ # Example TypeScript project setup
-    └── team-workflow/    # Team adoption strategies
+└── commands.md           # Complete CLI command reference
 ```
 
 ## 🔗 Key Concepts
@@ -142,19 +134,6 @@ Dungeon Master operates on these principles:
 3. **Empty templates are technical debt**
 4. **Professional diagrams are essential** for understanding
 5. **Manual overrides should be extremely rare** and well-justified
-
-## 📖 Next Steps
-
-- **New Users**: Start with [Getting Started Guide](getting-started.md)
-- **Team Leaders**: Review [Team Workflow Examples](examples/team-workflow/)
-- **Developers**: See [Development Workflow](workflow.md)
-- **Advanced Users**: Check [Configuration Options](configuration.md)
-
-## 🆘 Need Help?
-
-- **Common Issues**: See [Troubleshooting Guide](troubleshooting.md)
-- **Command Reference**: Full details in [Commands Guide](commands.md)
-- **Examples**: Practical setups in [Examples Directory](examples/)
 
 ## 🔧 Language Support
 

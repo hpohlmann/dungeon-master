@@ -4,24 +4,26 @@ This document provides a comprehensive reference for all Dungeon Master CLI comm
 
 ## 📋 Command Overview
 
-| Command | Purpose | Frequency |
-|---------|---------|-----------|
-| [`dm init`](#dm-init) | Initialize Dungeon Master in repository | Once per project |
-| [`dm validate`](#dm-validate) | Validate documentation status (pre-commit) | Automatic |
-| [`dm review`](#dm-review) | Display documentation status with rich formatting | Daily |
-| [`dm create_lore`](#dm-create_lore) | Generate documentation templates | As needed |
-| [`dm map`](#dm-map) | Generate visual repository structure | Weekly/monthly |
+| Command                             | Purpose                                           | Frequency        |
+| ----------------------------------- | ------------------------------------------------- | ---------------- |
+| [`dm init`](#dm-init)               | Initialize Dungeon Master in repository           | Once per project |
+| [`dm validate`](#dm-validate)       | Validate documentation status (pre-commit)        | Automatic        |
+| [`dm review`](#dm-review)           | Display documentation status with rich formatting | Daily            |
+| [`dm create_lore`](#dm-create_lore) | Generate documentation templates                  | As needed        |
+| [`dm map`](#dm-map)                 | Generate visual repository structure              | Weekly/monthly   |
 
 ## 🚀 dm init
 
 Initialize the Dungeon Master environment in your repository.
 
 ### Usage
+
 ```bash
 dm init
 ```
 
 ### Actions Performed
+
 - Creates `.lore/` directory for documentation
 - Creates `.cursor/rules/` directory for IDE integration
 - Copies Cursor rule templates for workflow guidance
@@ -31,6 +33,7 @@ dm init
 - Sets up pre-commit hook for validation
 
 ### Example Output
+
 ```
 ✨ Initializing Dungeon Master ✨
 
@@ -55,6 +58,7 @@ Initialization complete! Your project is now protected by Dungeon Master.
 ```
 
 ### Files Created
+
 ```
 your-project/
 ├── .lore/                                    # Documentation directory
@@ -69,6 +73,7 @@ your-project/
 ```
 
 ### Next Steps After Init
+
 1. Add `track_lore` decorators to your code
 2. Run `dm create_lore` to generate templates
 3. Fill out documentation templates
@@ -81,18 +86,21 @@ your-project/
 Core pre-commit hook functionality that verifies documentation is up-to-date. This runs automatically before each commit.
 
 ### Usage
+
 ```bash
 dm validate
 ```
 
 ### Validation Checks
+
 - ✅ Each tracked file has corresponding documentation
-- ✅ Changed tracked files have updated documentation  
+- ✅ Changed tracked files have updated documentation
 - ✅ Documentation contains actual content (not just templates)
 - ✅ Required sections are completed
 - ✅ Professional diagrams are included
 
 ### Success Output
+
 ```
 🔒 Validating Documentation 🔒
 
@@ -108,6 +116,7 @@ All documentation is up-to-date!
 ```
 
 ### Failure Output
+
 ```
 🔒 Validating Documentation 🔒
 
@@ -127,17 +136,18 @@ REQUIRED ACTIONS:
      REVIEW ALL FILES TRACKED BY THIS LORE FILE:
      - src/api/payment.py
      - src/api/payment_processor.py
-     
+
   2. COMPLETE .lore/auth/login.md TEMPLATE WITH ACTUAL DOCUMENTATION
      REVIEW ALL FILES TRACKED BY THIS LORE FILE:
      - src/auth/login.py
-     
+
      MISSING REQUIRED SECTIONS: Overview, Key Functions/Components, Diagrams
 
 🛑 COMMIT BLOCKED: UPDATE DOCUMENTATION BEFORE PROCEEDING
 ```
 
 ### When It Runs
+
 - Automatically during `git commit`
 - Manually when you run `dm validate`
 - Can be integrated into CI/CD pipelines
@@ -149,16 +159,19 @@ REQUIRED ACTIONS:
 Display documentation status using rich formatting with detailed information about what needs attention.
 
 ### Usage
+
 ```bash
 dm review [options]
 ```
 
 ### Options
+
 ```
 --mark-reviewed <file>    Mark a file as reviewed (EMERGENCY USE ONLY)
 ```
 
 ### Standard Output
+
 ```
 🔍 Documentation Review 🔍
 
@@ -181,13 +194,14 @@ dm review [options]
     REVIEW THESE FILES TO UNDERSTAND THE ENTIRE SYSTEM:
     - src/api/payment.py
     - src/api/payment_processor.py
-    
+
   → COMPLETE .lore/auth/login.md TEMPLATE WITH ACTUAL DOCUMENTATION
     REVIEW THESE FILES TO UNDERSTAND THE ENTIRE SYSTEM:
     - src/auth/login.py
 ```
 
 ### Status Indicators
+
 - **🟢 UP TO DATE**: Documentation is current with code changes
 - **🟡 TEMPLATE ONLY**: Documentation file exists but contains only template content
 - **🔴 NEEDS UPDATE**: Tracked files have changed but documentation hasn't been updated
@@ -202,17 +216,20 @@ dm review --mark-reviewed <file>
 ```
 
 This override should **ONLY** be used when:
+
 - File changes are truly minor (formatting, typos)
 - You've thoroughly reviewed both code and documentation
 - You can confidently confirm documentation remains accurate
 
 **Example:**
+
 ```bash
 # Only for genuinely minor changes
 dm review --mark-reviewed src/api/payment.py
 ```
 
 **Never use for:**
+
 - Behavior changes
 - New features
 - API modifications
@@ -225,20 +242,24 @@ dm review --mark-reviewed src/api/payment.py
 Generate documentation templates for all `track_lore` decorators found in the codebase.
 
 ### Usage
+
 ```bash
 dm create_lore [lore_file]
 ```
 
 ### Parameters
+
 - `lore_file` (optional): Create only a specific documentation file
 
 ### Actions
+
 - Scans codebase for `track_lore` decorators
 - Creates missing documentation files
 - Generates subdirectories as needed
 - Populates files with standard templates
 
 ### Example Output
+
 ```
 🔮 Creating Lore Files 🔮
 
@@ -251,10 +272,10 @@ dm create_lore [lore_file]
   ✅ .lore/users.md (exists)
   ❌ .lore/config.md (missing)
   ❌ .lore/auth/login.md (missing)
-  
+
 📁 Creating necessary directories...
   ✅ Created .lore/auth/ directory
-  
+
 📑 Creating missing lore files with templates...
   ✅ Created .lore/config.md with documentation template
   ✅ Created .lore/auth/login.md with documentation template
@@ -264,12 +285,14 @@ dm create_lore [lore_file]
 ```
 
 ### Creating Specific Files
+
 ```bash
 # Create only a specific documentation file
 dm create_lore api/payments.md
 ```
 
 ### What Happens Next
+
 1. Templates are created with placeholder content
 2. You must fill out all required sections
 3. Run `dm review` to check progress
@@ -282,17 +305,20 @@ dm create_lore api/payments.md
 Generate a visual representation of repository structure showing relationships between source files and documentation.
 
 ### Usage
+
 ```bash
 dm map
 ```
 
 ### Actions
+
 - Scans repository for tracked files
 - Maps relationships between code and documentation
 - Creates visual tree structure
 - Saves output to `.lore/map.md`
 
 ### Example Output
+
 ```
 📊 Generating Repository Map 📊
 
@@ -324,6 +350,7 @@ dm map
 ```
 
 ### Use Cases
+
 - Understanding documentation coverage
 - Onboarding new team members
 - Identifying documentation gaps
@@ -335,6 +362,7 @@ dm map
 ## 🔄 Common Command Workflows
 
 ### Initial Project Setup
+
 ```bash
 # Set up Dungeon Master
 dm init
@@ -357,6 +385,7 @@ git commit -m "Set up documentation system"
 ```
 
 ### Daily Development Workflow
+
 ```bash
 # Check what needs attention
 dm review
@@ -373,6 +402,7 @@ git commit -m "Feature with documentation"
 ```
 
 ### Documentation Maintenance
+
 ```bash
 # Generate repository overview
 dm map
@@ -393,32 +423,40 @@ dm review
 ### Common Errors and Solutions
 
 #### Not Initialized
+
 ```
 ❌ Error: Dungeon Master not initialized in this repository.
 Run `dm init` to set up Dungeon Master.
 ```
+
 **Solution**: Run `dm init` in your project root.
 
 #### Invalid Decorator Format
+
 ```
 ⚠️ Warning: Invalid track_lore format in src/api/payment.py:
 # track_lore(payments.md)
 Should be: # track_lore("payments.md")
 ```
+
 **Solution**: Add quotes around the file path.
 
 #### Missing Documentation Files
+
 ```
 ❌ Error: Documentation file not found: .lore/payments.md
 Referenced in: src/api/payment.py
 ```
+
 **Solution**: Run `dm create_lore` to generate missing files.
 
 #### Pre-commit Hook Failure
+
 ```
 ❌ Pre-commit hook failed: Documentation validation failed.
 Run `dm validate` for details.
 ```
+
 **Solution**: Run `dm validate` to see specific issues, then address them.
 
 ---
@@ -439,6 +477,7 @@ export DM_LOG_LEVEL="debug"                          # Set logging level
 ## 🔗 Integration with Other Tools
 
 ### CI/CD Pipeline
+
 ```yaml
 # GitHub Actions example
 - name: Validate Documentation
@@ -451,21 +490,16 @@ export DM_LOG_LEVEL="debug"                          # Set logging level
 ```
 
 ### IDE Integration
+
 - Cursor rules are automatically installed with `dm init`
 - Set up file watchers to run `dm review` on save
 - Create code snippets for `track_lore` decorators
 
 ### Git Hooks
+
 ```bash
 # Additional hooks can be added to .git/hooks/
 # Example: pre-push hook
 #!/bin/sh
 dm validate || exit 1
 ```
-
----
-
-For more information about specific workflows and best practices, see:
-- [Development Workflow Guide](workflow.md)
-- [Troubleshooting Guide](troubleshooting.md)
-- [Configuration Options](configuration.md)
